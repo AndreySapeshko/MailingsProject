@@ -1,13 +1,21 @@
 {% extends 'base.html' %}
 {% block content %}
 <div class="container mt-4">
-  <h2>Профиль пользователя</h2>
-  <p><strong>Имя пользователя:</strong> {{ request.user.username }}</p>
-  <p><strong>Email:</strong> {{ request.user.email }}</p>
-  <p><strong>Имя:</strong> {{ request.user.first_name }}</p>
-  <p><strong>Фамилия:</strong> {{ request.user.last_name }}</p>
+  {% if user.is_authenticated %}
+    <h2>Профиль пользователя</h2>
+    <p><strong>Имя пользователя:</strong> {{ user.username }}</p>
+    <p><strong>Email:</strong> {{ user.email }}</p>
+    <p><strong>Имя:</strong> {{ user.first_name }}</p>
+    <p><strong>Фамилия:</strong> {{ user.last_name }}</p>
 
-  <a href="{% url 'accounts:profile_edit' %}" class="btn btn-primary">Редактировать</a>
-  <a href="{% url 'accounts:logout' %}" class="btn btn-secondary">Выйти</a>
+    <a href="{% url 'accounts:profile_edit' %}" class="btn btn-primary">Редактировать</a>
+    <a href="{% url 'accounts:logout' %}" class="btn btn-secondary">Выйти</a>
+
+  {% else %}
+    <div class="alert alert-warning mt-3">
+      Чтобы просматривать профиль, нужно войти в систему.
+    </div>
+    <a href="{% url 'accounts:login' %}" class="btn btn-primary">Войти</a>
+  {% endif %}
 </div>
 {% endblock %}
