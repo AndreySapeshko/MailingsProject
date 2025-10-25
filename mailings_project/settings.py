@@ -49,6 +49,7 @@ INSTALLED_APPS = [
     "accounts",
     "debug_toolbar",
     "recipients",
+    "django_apscheduler",
     "scheduler"
 ]
 
