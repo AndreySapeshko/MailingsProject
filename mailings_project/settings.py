@@ -48,7 +48,8 @@ INSTALLED_APPS = [
     "mailings",
     "accounts",
     "debug_toolbar",
-    "recipients"
+    "recipients",
+    "scheduler"
 ]
 
 MIDDLEWARE = [
@@ -130,6 +131,9 @@ MESSAGE_TAGS = {
     messages.WARNING: 'warning',
     messages.ERROR: 'danger',
 }
+
+EMAIL_BACKEND = 'django.core.mail.backends.console.EmailBackend'
+DEFAULT_FROM_EMAIL = 'mailings@example.com'
 
 # Internationalization
 # https://docs.djangoproject.com/en/5.2/topics/i18n/

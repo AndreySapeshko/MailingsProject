@@ -1,9 +1,31 @@
+from django.views import View
 from django.views.generic import ListView, CreateView, UpdateView, DeleteView
 from django.contrib.auth.mixins import LoginRequiredMixin
+from django.shortcuts import get_object_or_404, redirect
+from django.urls import reverse
 from django.urls import reverse_lazy
 from django.contrib import messages
 from mailings.models import Mailing
 from mailings.forms import MailingForm
+
+
+class MailingActionView(LoginRequiredMixin, View):
+    """Обработчик кнопок: запуск, остановка, отправка сейчас"""
+
+    def post(self, request, pk, action):
+        mailing = get_object_or_404(Mailing, pk=pk, user=request.user)
+
+        if action == 'start':
+            mailing.launch()
+            messages.success(request, f"Рассылка '{mailing.name}' запущена.")
+        elif action == 'stop':
+            mailing.stop()
+            messages.warning(request, f"Рассылка '{mailing.name}' остановлена.")
+        elif action == 'send':
+            count = mailing.send_now()
+            messages.success(request, f"Отправлено писем: {count}")
+
+        return redirect(reverse('mailings:mailing_list'))
 
 
 class MailingListView(LoginRequiredMixin, ListView):
