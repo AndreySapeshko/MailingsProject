@@ -3,6 +3,7 @@ from django.contrib.auth.mixins import LoginRequiredMixin
 from django.urls import reverse_lazy
 from django.contrib import messages
 from .models import Recipient
+from .forms import RecipientForm
 
 
 class RecipientListView(LoginRequiredMixin, ListView):
@@ -16,7 +17,7 @@ class RecipientListView(LoginRequiredMixin, ListView):
 
 class RecipientCreateView(LoginRequiredMixin, CreateView):
     model = Recipient
-    fields = ['name', 'email', 'comment']
+    form_class = RecipientForm
     template_name = 'recipients/recipient_form.html'
     success_url = reverse_lazy('recipients:list')
 
@@ -28,7 +29,7 @@ class RecipientCreateView(LoginRequiredMixin, CreateView):
 
 class RecipientUpdateView(LoginRequiredMixin, UpdateView):
     model = Recipient
-    fields = ['name', 'email', 'comment']
+    form_class = RecipientForm
     template_name = 'recipients/recipient_form.html'
     success_url = reverse_lazy('recipients:list')
 
