@@ -7,7 +7,7 @@
   <p><strong>Имя:</strong> {{ request.user.first_name }}</p>
   <p><strong>Фамилия:</strong> {{ request.user.last_name }}</p>
 
-  <a href="{% url 'profile_edit' %}" class="btn btn-primary">Редактировать</a>
-  <a href="{% url 'logout' %}" class="btn btn-secondary">Выйти</a>
+  <a href="{% url 'accounts:profile_edit' %}" class="btn btn-primary">Редактировать</a>
+  <a href="{% url 'accounts:logout' %}" class="btn btn-secondary">Выйти</a>
 </div>
 {% endblock %}
