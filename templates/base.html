@@ -14,54 +14,69 @@
 </head>
 <body class="d-flex flex-column min-vh-100">
 
-    <!-- Навигационная панель -->
-    <nav class="navbar navbar-expand-lg navbar-dark bg-primary shadow-sm">
-        <div class="container">
-            <a class="navbar-brand fw-bold" href="/">Mailings Project</a>
-            <button class="navbar-toggler" type="button" data-bs-toggle="collapse"
-                    data-bs-target="#navbarNav" aria-controls="navbarNav" aria-expanded="false"
-                    aria-label="Toggle navigation">
-                <span class="navbar-toggler-icon"></span>
-            </button>
+<!-- Навигационная панель -->
+<nav class="navbar navbar-expand-lg navbar-dark bg-dark">
+    <div class="container">
+        <a class="navbar-brand fw-bold" href="/">Mailings Project</a>
+        <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav">
+            <span class="navbar-toggler-icon"></span>
+        </button>
 
-            <div class="collapse navbar-collapse" id="navbarNav">
-                <ul class="navbar-nav ms-auto">
-                    {% if user.is_authenticated %}
-                        <li class="nav-item">
-                            <a class="nav-link" href="{% url 'accounts:profile' %}">{{ user.username }}</a>
-                        </li>
-                        <li class="nav-item">
-                            <a class="nav-link" href="{% url 'accounts:logout' %}">Выйти</a>
-                        </li>
-                    {% else %}
-                        <li class="nav-item">
-                            <a class="nav-link" href="{% url 'accounts:login' %}">Войти</a>
-                        </li>
-                        <li class="nav-item">
-                            <a class="nav-link" href="{% url 'accounts:register' %}">Регистрация</a>
-                        </li>
-                    {% endif %}
-                </ul>
-            </div>
+        <div class="collapse navbar-collapse" id="navbarNav">
+            <ul class="navbar-nav me-auto mb-2 mb-lg-0">
+                {% if user.is_authenticated %}
+                <li class="nav-item">
+                    <a class="nav-link {% if request.resolver_match.url_name == 'mailing_list' %}active{% endif %}"
+                       href="{% url 'mailings:mailing_list' %}">Рассылки</a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link {% if request.resolver_match.url_name == 'message_list' %}active{% endif %}"
+                       href="{% url 'mailings:message_list' %}">Сообщения</a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link {% if request.resolver_match.url_name == 'list' %}active{% endif %}"
+                       href="{% url 'recipients:list' %}">Получатели</a>
+                </li>
+                {% endif %}
+            </ul>
+
+            <ul class="navbar-nav">
+                {% if user.is_authenticated %}
+                <li class="nav-item">
+                    <a class="nav-link" href="{% url 'accounts:profile' %}">{{ user.username }}</a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link text-warning" href="{% url 'accounts:logout' %}">Выйти</a>
+                </li>
+                {% else %}
+                <li class="nav-item">
+                    <a class="nav-link" href="{% url 'accounts:login' %}">Войти</a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link" href="{% url 'accounts:register' %}">Регистрация</a>
+                </li>
+                {% endif %}
+            </ul>
         </div>
-    </nav>
+    </div>
+</nav>
 
-    <!-- Основной контент -->
-    <main class="flex-grow-1 py-4">
-        <div class="container">
-            {% include 'includes/messages.html' %}
-            {% block content %}{% endblock %}
-        </div>
-    </main>
+<!-- Основной контент -->
+<main class="flex-grow-1 py-4">
+    <div class="container">
+        {% include 'includes/messages.html' %}
+        {% block content %}{% endblock %}
+    </div>
+</main>
 
-    <!-- Подвал -->
-    <footer class="bg-light py-3 mt-auto border-top">
-        <div class="container text-center text-muted small">
-            © {{ now|date:"Y" }} Mailings Project | Разработано Андреем Сапешко
-        </div>
-    </footer>
+<!-- Подвал -->
+<footer class="bg-light py-3 mt-auto border-top">
+    <div class="container text-center text-muted small">
+        © {{ now|date:"Y" }} Mailings Project | Разработано Андреем Сапешко
+    </div>
+</footer>
 
-    <!-- Bootstrap JS -->
-    <script src="{% static 'js/bootstrap.bundle.min.js' %}"></script>
+<!-- Bootstrap JS -->
+<script src="{% static 'js/bootstrap.bundle.min.js' %}"></script>
 </body>
 </html>
