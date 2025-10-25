@@ -1,0 +1,36 @@
+{% extends 'base.html' %}
+{% block title %}Мои шаблоны писем{% endblock %}
+{% block content %}
+<div class="container mt-4">
+  <div class="d-flex justify-content-between align-items-center mb-3">
+    <h2>Мои шаблоны писем</h2>
+    <a href="{% url 'mailings:message_create' %}" class="btn btn-success">Создать шаблон</a>
+  </div>
+
+  {% if messages %}
+    <table class="table table-striped align-middle">
+      <thead class="table-primary">
+        <tr>
+          <th>Тема</th>
+          <th>Текст</th>
+          <th class="text-end">Действия</th>
+        </tr>
+      </thead>
+      <tbody>
+        {% for message in messages %}
+          <tr>
+            <td>{{ message.subject }}</td>
+            <td class="text-muted small">{{ message.body|truncatechars:100 }}</td>
+            <td class="text-end">
+              <a href="{% url 'mailings:message_update' message.pk %}" class="btn btn-sm btn-primary">Редактировать</a>
+              <a href="{% url 'mailings:message_delete' message.pk %}" class="btn btn-sm btn-danger">Удалить</a>
+            </td>
+          </tr>
+        {% endfor %}
+      </tbody>
+    </table>
+  {% else %}
+    <div class="alert alert-info">Шаблонов пока нет.</div>
+  {% endif %}
+</div>
+{% endblock %}
