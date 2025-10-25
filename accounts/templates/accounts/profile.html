@@ -1,21 +1,18 @@
 {% extends 'base.html' %}
+{% block title %}Профиль{% endblock %}
 {% block content %}
-<div class="container mt-4">
-  {% if user.is_authenticated %}
-    <h2>Профиль пользователя</h2>
-    <p><strong>Имя пользователя:</strong> {{ user.username }}</p>
-    <p><strong>Email:</strong> {{ user.email }}</p>
-    <p><strong>Имя:</strong> {{ user.first_name }}</p>
-    <p><strong>Фамилия:</strong> {{ user.last_name }}</p>
+<div class="container mt-4 col-md-6">
+  <div class="card shadow-sm p-4">
+    <h3 class="text-center mb-3">Профиль</h3>
 
-    <a href="{% url 'accounts:profile_edit' %}" class="btn btn-primary">Редактировать</a>
-    <a href="{% url 'accounts:logout' %}" class="btn btn-secondary">Выйти</a>
-
-  {% else %}
-    <div class="alert alert-warning mt-3">
-      Чтобы просматривать профиль, нужно войти в систему.
-    </div>
-    <a href="{% url 'accounts:login' %}" class="btn btn-primary">Войти</a>
-  {% endif %}
+    <form method="post">
+      {% csrf_token %}
+      {{ form.as_p }}
+      <div class="text-center mt-3">
+        <button type="submit" class="btn btn-primary me-2">Сохранить</button>
+        <a href="{% url 'home' %}" class="btn btn-secondary">На главную</a>
+      </div>
+    </form>
+  </div>
 </div>
 {% endblock %}

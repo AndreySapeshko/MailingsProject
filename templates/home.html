@@ -1,0 +1,55 @@
+{% extends 'base.html' %}
+{% block title %}Главная{% endblock %}
+{% block content %}
+<div class="container mt-5">
+  <div class="text-center mb-5">
+    <h1 class="fw-bold">Mailings Project</h1>
+    <p class="text-muted fs-5">Простой и мощный сервис e-mail рассылок</p>
+  </div>
+
+  <div class="row justify-content-center g-4">
+    <div class="col-md-3">
+      <div class="card shadow-sm border-0 h-100">
+        <div class="card-body text-center">
+          <div class="fs-1 text-primary mb-3">📨</div>
+          <h5 class="card-title mb-3">Рассылки</h5>
+          <p class="card-text text-muted small">
+            Управляйте своими e-mail рассылками: создавайте, запускайте, анализируйте.
+          </p>
+          <a href="{% url 'mailings:mailing_list' %}" class="btn btn-primary w-100">Перейти</a>
+        </div>
+      </div>
+    </div>
+
+    <div class="col-md-3">
+      <div class="card shadow-sm border-0 h-100">
+        <div class="card-body text-center">
+          <div class="fs-1 text-success mb-3">🧾</div>
+          <h5 class="card-title mb-3">Сообщения</h5>
+          <p class="card-text text-muted small">
+            Создавайте шаблоны писем, которые будут использоваться в рассылках.
+          </p>
+          <a href="{% url 'mailings:message_list' %}" class="btn btn-success w-100">Перейти</a>
+        </div>
+      </div>
+    </div>
+
+    <div class="col-md-3">
+      <div class="card shadow-sm border-0 h-100">
+        <div class="card-body text-center">
+          <div class="fs-1 text-info mb-3">👥</div>
+          <h5 class="card-title mb-3">Получатели</h5>
+          <p class="card-text text-muted small">
+            Управляйте списком ваших клиентов и подписчиков.
+          </p>
+          <a href="{% url 'recipients:list' %}" class="btn btn-info w-100 text-white">Перейти</a>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="text-center mt-5">
+    <p class="text-muted small">© 2025 Mailings Project — разработано с ❤️ инженером Андреем Сапешко</p>
+  </div>
+</div>
+{% endblock %}

@@ -5,7 +5,7 @@ from django.shortcuts import redirect
 from django.urls import reverse_lazy
 from django.contrib.auth.models import User
 from django.contrib import messages
-from .forms import RegisterForm, UserUpdateForm
+from .forms import RegisterForm, ProfileForm
 
 
 class LoginUserView(LoginView):
@@ -53,7 +53,7 @@ class ProfileView(TemplateView):
 
 class ProfileEditView(UpdateView):
     model = User
-    form_class = UserUpdateForm
+    form_class = ProfileForm
     template_name = 'accounts/profile_edit.html'
     success_url = reverse_lazy('accounts:profile')
 

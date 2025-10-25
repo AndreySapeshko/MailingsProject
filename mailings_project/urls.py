@@ -20,8 +20,10 @@ from django.http import HttpResponse
 from django.urls import path, include
 from django.conf import settings
 from django.conf.urls.static import static
+from mailings.views.home_view import HomeView
 
 urlpatterns = [
+    path('', HomeView.as_view(), name='home'),
     path("admin/", admin.site.urls),
     path('accounts/', include('accounts.urls', namespace='accounts')),
     path('recipients/', include('recipients.urls', namespace='recipients')),
