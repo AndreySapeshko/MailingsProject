@@ -47,7 +47,8 @@ INSTALLED_APPS = [
     "django.contrib.staticfiles",
     "mailings",
     "accounts",
-    "debug_toolbar"
+    "debug_toolbar",
+    "recipients"
 ]
 
 MIDDLEWARE = [
