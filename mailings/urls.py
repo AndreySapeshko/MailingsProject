@@ -1,5 +1,6 @@
 from django.urls import path
 from mailings.views.log_views import MailingLogListView
+from mailings.views.statistics_views import MailingStatisticsView
 from mailings.views.message_views import (
     MessageListView, MessageCreateView,
     MessageUpdateView, MessageDeleteView
@@ -28,4 +29,5 @@ urlpatterns = [
 
 urlpatterns += [
     path('logs/', MailingLogListView.as_view(), name='mailing_logs'),
+    path('statistics/', MailingStatisticsView.as_view(), name='mailing_statistics'),
 ]

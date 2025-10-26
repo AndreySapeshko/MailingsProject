@@ -41,6 +41,10 @@
                     <a class="nav-link {% if request.resolver_match.url_name == 'mailing_logs' %}active{% endif %}"
                        href="{% url 'mailings:mailing_logs' %}">История</a>
                 </li>
+                <li class="nav-item">
+                    <a class="nav-link {% if request.resolver_match.url_name == 'mailing_statistics' %}active{% endif %}"
+                       href="{% url 'mailings:mailing_statistics' %}">Статистика</a>
+                </li>
 
                 {% endif %}
             </ul>
