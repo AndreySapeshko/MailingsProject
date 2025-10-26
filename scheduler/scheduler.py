@@ -1,8 +1,13 @@
+import os
+
 from apscheduler.schedulers.background import BackgroundScheduler
 from django_apscheduler.jobstores import DjangoJobStore
 from scheduler.tasks import run_mailing_tasks
 
 def start():
+    if os.environ.get('RUN_MAIN') != 'true':
+        print("⚙️ Планировщик не запущен (вспомогательный процесс runserver).")
+        return
     scheduler = BackgroundScheduler()
     scheduler.add_jobstore(DjangoJobStore(), "default")
 

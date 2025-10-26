@@ -1,4 +1,6 @@
 from django import forms
+
+from recipients.models import Recipient
 from .models import Message, Mailing
 
 class StyledFormMixin:
@@ -50,3 +52,10 @@ class MailingForm(StyledFormMixin, forms.ModelForm):
             'dispatch_end_date': forms.DateTimeInput(attrs={'type': 'datetime-local'}),
             'recipients': forms.SelectMultiple(attrs={'size': 6}),
         }
+
+    def __init__(self, *args, **kwargs):
+        user = kwargs.pop('user', None)  # извлекаем текущего пользователя
+        super().__init__(*args, **kwargs)
+        if user:
+            self.fields['recipients'].queryset = Recipient.objects.filter(user=user)
+            self.fields['message'].queryset = Message.objects.filter(user=user)

@@ -39,6 +39,7 @@ INTERNAL_IPS = [
 # Application definition
 
 INSTALLED_APPS = [
+    "jazzmin",
     "django.contrib.admin",
     "django.contrib.auth",
     "django.contrib.contenttypes",
@@ -50,7 +51,8 @@ INSTALLED_APPS = [
     "debug_toolbar",
     "recipients",
     "django_apscheduler",
-    "scheduler"
+    "scheduler",
+    "users"
 ]
 
 MIDDLEWARE = [
@@ -120,6 +122,8 @@ AUTH_PASSWORD_VALIDATORS = [
 AUTHENTICATION_BACKENDS = [
     'django.contrib.auth.backends.ModelBackend',
 ]
+
+AUTH_USER_MODEL = 'users.CustomUser'
 
 LOGIN_REDIRECT_URL = 'home'
 LOGOUT_REDIRECT_URL = 'accounts:login'

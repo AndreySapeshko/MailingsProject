@@ -2,17 +2,17 @@
 {% block title %}Профиль{% endblock %}
 {% block content %}
 <div class="container mt-4 col-md-6">
-  <div class="card shadow-sm p-4">
-    <h3 class="text-center mb-3">Профиль</h3>
+    <div class="card shadow-sm p-4">
+        <h3 class="text-center mb-3">Профиль</h3>
 
-    <form method="post">
-      {% csrf_token %}
-      {{ form.as_p }}
-      <div class="text-center mt-3">
-        <button type="submit" class="btn btn-primary me-2">Сохранить</button>
-        <a href="{% url 'home' %}" class="btn btn-secondary">На главную</a>
-      </div>
-    </form>
-  </div>
+        <form method="post">
+            {% csrf_token %}
+            {{ form.as_p }}
+            <div class="text-center mt-3">
+                <a href="{% url 'accounts:profile_edit' %}" class="btn btn-primary">Редактировать</a>
+                <a href="{% url 'home' %}" class="btn btn-secondary">На главную</a>
+            </div>
+        </form>
+    </div>
 </div>
 {% endblock %}
