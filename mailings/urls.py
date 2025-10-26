@@ -1,4 +1,5 @@
 from django.urls import path
+from mailings.views.log_views import MailingLogListView
 from mailings.views.message_views import (
     MessageListView, MessageCreateView,
     MessageUpdateView, MessageDeleteView
@@ -23,4 +24,8 @@ urlpatterns = [
     path('mailings/<int:pk>/update/', MailingUpdateView.as_view(), name='mailing_update'),
     path('mailings/<int:pk>/delete/', MailingDeleteView.as_view(), name='mailing_delete'),
     path('mailings/<int:pk>/<str:action>/', MailingActionView.as_view(), name='mailing_action'),
+]
+
+urlpatterns += [
+    path('logs/', MailingLogListView.as_view(), name='mailing_logs'),
 ]
