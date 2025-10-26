@@ -4,6 +4,7 @@ from django.urls import reverse_lazy
 from django.contrib import messages
 from mailings.models import Message
 from mailings.forms import MessageForm
+from users.mixins import OwnerOrManagerMixin, ManagerRequiredMixin
 
 
 class MessageListView(LoginRequiredMixin, ListView):
@@ -12,7 +13,11 @@ class MessageListView(LoginRequiredMixin, ListView):
     context_object_name = 'messages'
 
     def get_queryset(self):
-        return Message.objects.filter(user=self.request.user)
+        qs = super().get_queryset()
+        user = self.request.user
+        if user.is_manager() or user.is_superuser:
+            return qs
+        return qs.filter(user=user)
 
 
 class MessageCreateView(LoginRequiredMixin, CreateView):
@@ -27,7 +32,7 @@ class MessageCreateView(LoginRequiredMixin, CreateView):
         return super().form_valid(form)
 
 
-class MessageUpdateView(LoginRequiredMixin, UpdateView):
+class MessageUpdateView(OwnerOrManagerMixin, LoginRequiredMixin, UpdateView):
     model = Message
     form_class = MessageForm
     template_name = 'mailings/messages/message_form.html'
@@ -41,7 +46,7 @@ class MessageUpdateView(LoginRequiredMixin, UpdateView):
         return super().form_valid(form)
 
 
-class MessageDeleteView(LoginRequiredMixin, DeleteView):
+class MessageDeleteView(OwnerOrManagerMixin, LoginRequiredMixin, DeleteView):
     model = Message
     template_name = 'mailings/messages/message_confirm_delete.html'
     success_url = reverse_lazy('mailings:message_list')

@@ -4,6 +4,7 @@ from django.urls import reverse_lazy
 from django.contrib import messages
 from .models import Recipient
 from .forms import RecipientForm
+from users.mixins import OwnerOrManagerMixin, ManagerRequiredMixin
 
 
 class RecipientListView(LoginRequiredMixin, ListView):
@@ -12,7 +13,11 @@ class RecipientListView(LoginRequiredMixin, ListView):
     context_object_name = 'recipients'
 
     def get_queryset(self):
-        return Recipient.objects.filter(user=self.request.user)
+        qs = super().get_queryset()
+        user = self.request.user
+        if user.is_manager() or user.is_superuser:
+            return qs
+        return qs.filter(user=user)
 
 
 class RecipientCreateView(LoginRequiredMixin, CreateView):
@@ -27,7 +32,7 @@ class RecipientCreateView(LoginRequiredMixin, CreateView):
         return super().form_valid(form)
 
 
-class RecipientUpdateView(LoginRequiredMixin, UpdateView):
+class RecipientUpdateView(OwnerOrManagerMixin, LoginRequiredMixin, UpdateView):
     model = Recipient
     form_class = RecipientForm
     template_name = 'recipients/recipient_form.html'
@@ -41,7 +46,7 @@ class RecipientUpdateView(LoginRequiredMixin, UpdateView):
         return super().form_valid(form)
 
 
-class RecipientDeleteView(LoginRequiredMixin, DeleteView):
+class RecipientDeleteView(OwnerOrManagerMixin, LoginRequiredMixin, DeleteView):
     model = Recipient
     template_name = 'recipients/recipient_confirm_delete.html'
     success_url = reverse_lazy('recipients:list')
