@@ -4,20 +4,13 @@ from django.urls import reverse_lazy
 from django.contrib import messages
 from .models import Recipient
 from .forms import RecipientForm
-from users.mixins import OwnerOrManagerMixin, ManagerRequiredMixin
+from users.mixins import AccessByRoleMixin
 
 
-class RecipientListView(LoginRequiredMixin, ListView):
+class RecipientListView(LoginRequiredMixin, AccessByRoleMixin, ListView):
     model = Recipient
     template_name = 'recipients/recipient_list.html'
     context_object_name = 'recipients'
-
-    def get_queryset(self):
-        qs = super().get_queryset()
-        user = self.request.user
-        if user.is_manager() or user.is_superuser:
-            return qs
-        return qs.filter(user=user)
 
 
 class RecipientCreateView(LoginRequiredMixin, CreateView):
@@ -32,27 +25,22 @@ class RecipientCreateView(LoginRequiredMixin, CreateView):
         return super().form_valid(form)
 
 
-class RecipientUpdateView(OwnerOrManagerMixin, LoginRequiredMixin, UpdateView):
+class RecipientUpdateView(LoginRequiredMixin, AccessByRoleMixin, UpdateView):
     model = Recipient
     form_class = RecipientForm
     template_name = 'recipients/recipient_form.html'
     success_url = reverse_lazy('recipients:list')
-
-    def get_queryset(self):
-        return Recipient.objects.filter(user=self.request.user)
 
     def form_valid(self, form):
         messages.success(self.request, 'Данные получателя обновлены.')
         return super().form_valid(form)
 
 
-class RecipientDeleteView(OwnerOrManagerMixin, LoginRequiredMixin, DeleteView):
+class RecipientDeleteView(LoginRequiredMixin, AccessByRoleMixin, DeleteView):
     model = Recipient
     template_name = 'recipients/recipient_confirm_delete.html'
     success_url = reverse_lazy('recipients:list')
 
-    def get_queryset(self):
-        return Recipient.objects.filter(user=self.request.user)
 
     def delete(self, request, *args, **kwargs):
         messages.info(self.request, 'Получатель удалён.')

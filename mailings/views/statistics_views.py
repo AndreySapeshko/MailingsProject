@@ -2,8 +2,9 @@ from django.views.generic import TemplateView
 from django.contrib.auth.mixins import LoginRequiredMixin
 from django.db.models import Count, Q
 from mailings.models import MailingLog, Mailing
+from users.mixins import AccessByRoleMixin
 
-class MailingStatisticsView(LoginRequiredMixin, TemplateView):
+class MailingStatisticsView(LoginRequiredMixin, AccessByRoleMixin, TemplateView):
     template_name = 'mailings/mailing_statistics.html'
 
     def get_context_data(self, **kwargs):
@@ -11,7 +12,10 @@ class MailingStatisticsView(LoginRequiredMixin, TemplateView):
         user = self.request.user
 
         # Общие показатели
-        logs = MailingLog.objects.filter(mailing__user=user)
+        if user.is_manager() or user.is_superuser:
+            logs = MailingLog.objects.all()
+        else:
+            logs = MailingLog.objects.filter(mailing__user=user)
         total = logs.count()
         success = logs.filter(status='success').count()
         failed = logs.filter(status='failed').count()

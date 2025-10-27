@@ -129,6 +129,15 @@ LOGIN_REDIRECT_URL = 'home'
 LOGOUT_REDIRECT_URL = 'accounts:login'
 LOGIN_URL = 'accounts:login'
 
+# РОЛЕВАЯ МОДЕЛЬ ДОСТУПА (Access Control Configuration)
+ROLE_ACCESS = {
+    # app_label: [разрешённые роли]
+    'mailings': ['manager', 'admin'],
+    'recipients': ['manager', 'admin'],
+    'messages': ['manager', 'admin'],
+    'users': ['admin'],  # например, просмотр всех пользователей
+}
+
 MESSAGE_TAGS = {
     messages.DEBUG: 'secondary',
     messages.INFO: 'info',
