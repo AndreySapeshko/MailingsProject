@@ -14,6 +14,13 @@ class MailingLog(models.Model):
         ('failed', 'Ошибка'),
     ])
     server_response = models.TextField(blank=True, null=True)
+    user = models.ForeignKey(
+        settings.AUTH_USER_MODEL,
+        on_delete=models.CASCADE,
+        related_name='mailing_logs',
+        verbose_name='Пользователь',
+        null=True, blank=True, default=None
+    )
 
     def __str__(self):
         return f"{self.mailing.name} → {self.recipient.email} [{self.status}]"
@@ -89,6 +96,7 @@ class Mailing(models.Model):
                     recipient=recipient,
                     status='success',
                     server_response='OK',
+                    user=self.user,
                 )
                 sent_count += 1
             except Exception as e:
@@ -97,6 +105,7 @@ class Mailing(models.Model):
                     recipient=recipient,
                     status='failed',
                     server_response=str(e),
+                    user=self.user,
                 )
         self.status = 'completed'
         self.save(update_fields=['status'])

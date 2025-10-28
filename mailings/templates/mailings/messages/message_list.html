@@ -7,7 +7,7 @@
     <a href="{% url 'mailings:message_create' %}" class="btn btn-success">Создать шаблон</a>
   </div>
 
-  {% if messages %}
+  {% if msgs %}
     <table class="table table-striped align-middle">
       <thead class="table-primary">
         <tr>
@@ -17,13 +17,13 @@
         </tr>
       </thead>
       <tbody>
-        {% for message in messages %}
+        {% for msg in msgs %}
           <tr>
-            <td>{{ message.subject }}</td>
-            <td class="text-muted small">{{ message.body|truncatechars:100 }}</td>
+            <td>{{ msg.subject }}</td>
+            <td class="text-muted small">{{ msg.body|truncatechars:100 }}</td>
             <td class="text-end">
-              <a href="{% url 'mailings:message_update' message.pk %}" class="btn btn-sm btn-primary">Редактировать</a>
-              <a href="{% url 'mailings:message_delete' message.pk %}" class="btn btn-sm btn-danger">Удалить</a>
+              <a href="{% url 'mailings:message_update' msg.pk %}" class="btn btn-sm btn-primary">Редактировать</a>
+              <a href="{% url 'mailings:message_delete' msg.pk %}" class="btn btn-sm btn-danger">Удалить</a>
             </td>
           </tr>
         {% endfor %}

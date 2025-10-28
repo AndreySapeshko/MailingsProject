@@ -34,6 +34,7 @@ class AccessByRoleMixin(UserPassesTestMixin):
     """
 
     raise_exception = True  # возвращать 403 при отсутствии прав
+    allow_view_only_roles = getattr(settings, "ALLOW_VIEW_ONLY_ROLES", ['manager'])
 
     def get_allowed_roles(self, obj_or_model):
         """
@@ -52,6 +53,7 @@ class AccessByRoleMixin(UserPassesTestMixin):
     def test_func(self):
         """Проверка прав для Detail/Update/DeleteView"""
         user = self.request.user
+        method = self.request.method
 
         # Суперпользователь — всегда имеет доступ
         if user.is_superuser:
@@ -66,6 +68,9 @@ class AccessByRoleMixin(UserPassesTestMixin):
 
             allowed_roles = self.get_allowed_roles(obj)
             if user.role in allowed_roles:
+                return True
+
+            if user.role in self.allow_view_only_roles and method in ['GET', 'HEAD', 'OPTIONS']:
                 return True
 
             if isinstance(obj, User) and obj == user:
@@ -90,7 +95,7 @@ class AccessByRoleMixin(UserPassesTestMixin):
 
         # Проверяем разрешённые роли по app_label
         allowed_roles = self.get_allowed_roles(qs.model)
-        if user.role in allowed_roles:
+        if user.role in allowed_roles or user.role in self.allow_view_only_roles:
             return qs
 
         # Владелец видит только свои объекты

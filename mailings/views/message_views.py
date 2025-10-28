@@ -10,7 +10,7 @@ from users.mixins import AccessByRoleMixin
 class MessageListView(LoginRequiredMixin, AccessByRoleMixin, ListView):
     model = Message
     template_name = 'mailings/messages/message_list.html'
-    context_object_name = 'messages'
+    context_object_name = 'msgs'
 
 
 class MessageCreateView(LoginRequiredMixin, CreateView):

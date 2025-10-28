@@ -132,11 +132,13 @@ LOGIN_URL = 'accounts:login'
 # РОЛЕВАЯ МОДЕЛЬ ДОСТУПА (Access Control Configuration)
 ROLE_ACCESS = {
     # app_label: [разрешённые роли]
-    'mailings': ['manager', 'admin'],
-    'recipients': ['manager', 'admin'],
-    'messages': ['manager', 'admin'],
+    'mailings': ['admin'],
+    'recipients': ['admin'],
+    'messages': ['admin'],
     'users': ['admin'],  # например, просмотр всех пользователей
 }
+
+ALLOW_VIEW_ONLY_ROLES = ['manager']
 
 MESSAGE_TAGS = {
     messages.DEBUG: 'secondary',
