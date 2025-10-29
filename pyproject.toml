@@ -15,7 +15,8 @@ dependencies = [
     "whitenoise (>=6.11.0,<7.0.0)",
     "psycopg2-binary (>=2.9.11,<3.0.0)",
     "ipython (>=9.6.0,<10.0.0)",
-    "django-apscheduler (>=0.7.0,<0.8.0)"
+    "django-apscheduler (>=0.7.0,<0.8.0)",
+    "djangorestframework (>=3.16.1,<4.0.0)"
 ]
 
 

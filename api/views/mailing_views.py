@@ -1,11 +1,12 @@
 from rest_framework import viewsets, permissions
 from mailings.models import Mailing
 from api.serializers.mailing_serializers import MailingSerializer
+from api.permissions import RoleBasedAccessPermission
 
 class MailingViewSet(viewsets.ModelViewSet):
     queryset = Mailing.objects.all()
     serializer_class = MailingSerializer
-    permission_classes = [permissions.IsAuthenticated]
+    permission_classes = [RoleBasedAccessPermission]
 
     def perform_create(self, serializer):
         serializer.save(user=self.request.user)
