@@ -3,6 +3,9 @@ from functools import wraps
 import hashlib
 import json
 
+from rest_framework.response import Response
+
+
 def make_cache_key(request, prefix="api"):
     """
     Генерирует уникальный ключ для запроса на основе URL, пользователя и параметров.
@@ -25,14 +28,14 @@ def cache_response(timeout=60):
 
             cache_key = make_cache_key(request)
             cached_data = cache.get(cache_key)
-            if cached_data:
+            if cached_data is not None and cached_data != b'':
                 print(f"⚡ Кеш API: {cache_key}")
-                return cached_data
+                return Response(cached_data)
 
             response = func(self, request, *args, **kwargs)
             # Проверяем, что это Response с сериализованными данными
             try:
-                cache.set(cache_key, response, timeout=timeout)
+                cache.set(cache_key, response.data, timeout=timeout)
             except Exception as e:
                 print(f"⚠️ Ошибка кеширования: {e}")
 
