@@ -54,7 +54,7 @@ INSTALLED_APPS = [
     "django_apscheduler",
     "scheduler",
     "users",
-    # REST API
+    "core",
     'rest_framework',
 ]
 
@@ -173,10 +173,10 @@ CACHES = {
     "default": {
         "BACKEND": "django_redis.cache.RedisCache",
         "LOCATION": f"redis://{REDIS_HOST}:{REDIS_PORT}/1",
-        # 'LOCATION': 'redis://127.0.0.1:6379/1',
         "OPTIONS": {
             "CLIENT_CLASS": "django_redis.client.DefaultClient",
-        }
+        },
+        "KEY_PREFIX": "mailings_project",
     }
 }
 
