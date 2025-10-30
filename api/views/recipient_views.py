@@ -3,7 +3,7 @@ from rest_framework import viewsets
 from mailings.models import Recipient
 from api.serializers.recipient_serializers import RecipientSerializer
 from api.mixins import BaseCachedViewSetMixin
-from api.utils.cache import cache_response
+from api.permissions import RoleBasedAccessPermission
 
 
 class RecipientViewSet(BaseCachedViewSetMixin, viewsets.ModelViewSet):

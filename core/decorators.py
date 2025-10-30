@@ -14,13 +14,13 @@ def universal_cache(prefix="page", timeout=300):
     def decorator(view_func):
         @wraps(view_func)
         def wrapper(*args, **kwargs):
-            # Определяем request независимо от типа view
+            # Определяем request
             request = None
             for arg in args:
                 if hasattr(arg, "META"):  # HttpRequest
                     request = arg
                     break
-                if hasattr(arg, "request"):  # self.request
+                if hasattr(arg, "request"):  # self.request (DRF)
                     request = arg.request
                     break
 
@@ -34,17 +34,22 @@ def universal_cache(prefix="page", timeout=300):
             path = request.get_full_path()
             cached = get_cache(path, user_id, prefix)
 
+            # 🔹 Кеш-хит
             if cached:
                 print(f"⚡ Кеш {prefix.upper()}: {path}")
-                if inspect.isclass(type(args[0])) and hasattr(args[0], "get_serializer"):  # DRF
+                if hasattr(args[0], "get_serializer"):  # DRF ViewSet
                     return Response(cached)
                 return HttpResponse(cached)
 
+            # 🔹 Вызываем оригинальный метод
             response = view_func(*args, **kwargs)
             data = None
+
+            # Если это DRF Response
             if isinstance(response, Response):
-                response.render()
+                # Не вызываем render(), просто берем data
                 data = response.data
+            # Если это обычный Django HttpResponse
             elif isinstance(response, HttpResponse):
                 data = response.content
 
