@@ -5,12 +5,21 @@ from django.contrib import messages
 from .models import Recipient
 from .forms import RecipientForm
 from users.mixins import AccessByRoleMixin
+from core.mixins.cache_mixins import CachedViewMixin
 
 
-class RecipientListView(LoginRequiredMixin, AccessByRoleMixin, ListView):
+class RecipientListView(CachedViewMixin, LoginRequiredMixin, AccessByRoleMixin, ListView):
     model = Recipient
     template_name = 'recipients/recipient_list.html'
     context_object_name = 'recipients'
+    cache_timeout = 600
+
+    def get_queryset(self):
+        user = self.request.user
+        qs = Recipient.objects.all()
+        if not (user.is_superuser or user.role in ['manager', 'admin']):
+            qs = qs.filter(user=user)
+        return qs
 
 
 class RecipientCreateView(LoginRequiredMixin, CreateView):

@@ -1,5 +1,6 @@
 from functools import wraps
 from django.http import HttpResponse
+from django.template.response import TemplateResponse
 from rest_framework.response import Response
 from core.cache_utils import get_cache, set_cache
 import inspect
@@ -49,6 +50,10 @@ def universal_cache(prefix="page", timeout=300):
             if isinstance(response, Response):
                 # Не вызываем render(), просто берем data
                 data = response.data
+                # TemplateResponse — сначала рендерим, потом читаем content
+            elif isinstance(response, TemplateResponse):
+                response.render()
+                data = response.content
             # Если это обычный Django HttpResponse
             elif isinstance(response, HttpResponse):
                 data = response.content

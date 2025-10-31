@@ -1,13 +1,14 @@
 from django.views import View
 from django.views.generic import ListView, CreateView, UpdateView, DeleteView
 from django.contrib.auth.mixins import LoginRequiredMixin
-from django.shortcuts import get_object_or_404, redirect
+from django.shortcuts import get_object_or_404, redirect, render
 from django.urls import reverse
 from django.urls import reverse_lazy
 from django.contrib import messages
 from mailings.models import Mailing
 from mailings.forms import MailingForm
 from users.mixins import AccessByRoleMixin
+from core.mixins.cache_mixins import CachedViewMixin
 
 
 class MailingActionView(LoginRequiredMixin, View):
@@ -29,10 +30,18 @@ class MailingActionView(LoginRequiredMixin, View):
         return redirect(reverse('mailings:mailing_list'))
 
 
-class MailingListView(LoginRequiredMixin, AccessByRoleMixin, ListView):
+class MailingListView(CachedViewMixin, LoginRequiredMixin, AccessByRoleMixin, ListView):
     model = Mailing
     template_name = 'mailings/mailing_list.html'
     context_object_name = 'mailings'
+    cache_timeout = 600
+
+    def get_queryset(self):
+        user = self.request.user
+        qs = Mailing.objects.all()
+        if not (user.is_superuser or user.role in ['manager', 'admin']):
+            qs = qs.filter(user=user)
+        return qs
 
 
 class MailingCreateView(LoginRequiredMixin, CreateView):

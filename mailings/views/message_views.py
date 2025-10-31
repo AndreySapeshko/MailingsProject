@@ -5,12 +5,21 @@ from django.contrib import messages
 from mailings.models import Message
 from mailings.forms import MessageForm
 from users.mixins import AccessByRoleMixin
+from core.mixins.cache_mixins import CachedViewMixin
 
 
-class MessageListView(LoginRequiredMixin, AccessByRoleMixin, ListView):
+class MessageListView(CachedViewMixin, LoginRequiredMixin, AccessByRoleMixin, ListView):
     model = Message
     template_name = 'mailings/messages/message_list.html'
     context_object_name = 'msgs'
+    cache_timeout = 600
+
+    def get_queryset(self):
+        user = self.request.user
+        qs = Message.objects.all()
+        if not (user.is_superuser or user.role in ['manager', 'admin']):
+            qs = qs.filter(user=user)
+        return qs
 
 
 class MessageCreateView(LoginRequiredMixin, CreateView):
