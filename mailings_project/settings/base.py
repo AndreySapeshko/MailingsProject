@@ -179,8 +179,8 @@ REST_FRAMEWORK = {
     'PAGE_SIZE': 10,
 }
 
-# REDIS_HOST = os.getenv("REDIS_HOST")
-# REDIS_PORT = int(os.getenv("REDIS_PORT"))
+REDIS_HOST = os.getenv("REDIS_HOST")
+REDIS_PORT = int(os.getenv("REDIS_PORT"))
 CACHES = {
     "default": {
         "BACKEND": "django_redis.cache.RedisCache",

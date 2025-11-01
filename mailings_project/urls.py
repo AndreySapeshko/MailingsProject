@@ -29,7 +29,8 @@ urlpatterns = [
     path('recipients/', include('recipients.urls', namespace='recipients')),
     path('mailings/', include('mailings.urls', namespace='mailings')),
     path('users/', include('users.urls', namespace='users')),
-    path('api/', include('api.urls', namespace='api'))
+    path('api/', include('api.urls', namespace='api')),
+    path('core/', include('core.urls', namespace='core')),
 ]
 
 if settings.DEBUG:

@@ -50,7 +50,11 @@
                     <a class="nav-link" href="/admin/">Админка</a>
                 </li>
                 {% endif %}
-
+                {% if user.is_superuser or user.role == 'admin' %}
+                <li class="nav-item">
+                    <a class="nav-link" href="{% url 'core:cache_status' %}">Кеш</a>
+                </li>
+                {% endif %}
                 {% endif %}
             </ul>
 
