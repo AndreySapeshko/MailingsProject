@@ -25,7 +25,6 @@ BASE_DIR = Path(__file__).resolve().parent.parent.parent
 env = environ.Env()
 env.read_env(os.path.join(BASE_DIR, '.env'))
 
-
 # Quick-start development settings - unsuitable for production
 # See https://docs.djangoproject.com/en/5.2/howto/deployment/checklist/
 
@@ -78,10 +77,11 @@ ROOT_URLCONF = "mailings_project.urls"
 TEMPLATES = [
     {
         "BACKEND": "django.template.backends.django.DjangoTemplates",
-        "DIRS": [os.path.join(BASE_DIR, 'templates')],
+        "DIRS": [BASE_DIR / "templates"],
         "APP_DIRS": True,
         "OPTIONS": {
             "context_processors": [
+                "django.template.context_processors.debug",
                 "django.template.context_processors.request",
                 "django.contrib.auth.context_processors.auth",
                 "django.contrib.messages.context_processors.messages",
@@ -90,9 +90,26 @@ TEMPLATES = [
     },
 ]
 
+JAZZMIN_SETTINGS = {
+    "site_title": "MailingsProject",
+    "site_header": "Панель рассылок",
+    "welcome_sign": "Добро пожаловать в MailingsProject!",
+    "site_brand": "MailingsProject",
+    "show_ui_builder": False,
+
+    # ✅ Добавим ссылку "На главную"
+    "topmenu_links": [
+        {"name": "🏠 На главную", "url": "home", "permissions": ["auth.view_user"]},
+        {"app": "auth"},  # пример — оставим встроенные пункты
+        {"app": "mailings"},
+    ],
+
+    # можно добавить favicon, логотип и цвета
+    # "site_logo": "static/img/logo.png",  # если хочешь — подключим позже
+}
+
 WSGI_APPLICATION = "mailings_project.wsgi.application"
 ASGI_APPLICATION = 'mailings_project.asgi.application'
-
 
 # Database
 # https://docs.djangoproject.com/en/5.2/ref/settings/#databases
@@ -103,7 +120,7 @@ DATABASES = {
         'NAME': env('DATABASE_NAME', default='mailings_project'),
         'USER': env('DATABASE_USER', default='postgres'),
         'PASSWORD': env('DATABASE_PASSWORD', default='postgres'),
-        'HOST': env('DATABASE_HOST', default='localhost'),
+        'HOST': env('DATABASE_HOST', default='db'),
         'PORT': env('DATABASE_PORT', default='5432'),
     }
 }
@@ -115,8 +132,6 @@ EMAIL_PORT = env.int('EMAIL_PORT', default=587)
 EMAIL_HOST_USER = env('EMAIL_HOST_USER', default='')
 EMAIL_HOST_PASSWORD = env('EMAIL_HOST_PASSWORD', default='')
 EMAIL_USE_TLS = env.bool('EMAIL_USE_TLS', default=True)
-
-
 
 # Password validation
 # https://docs.djangoproject.com/en/5.2/ref/settings/#auth-password-validators
@@ -165,7 +180,6 @@ MESSAGE_TAGS = {
     messages.ERROR: 'danger',
 }
 
-
 REST_FRAMEWORK = {
     'DEFAULT_AUTHENTICATION_CLASSES': [
         'rest_framework.authentication.SessionAuthentication',
@@ -202,7 +216,6 @@ TIME_ZONE = "Europe/Moscow"
 USE_I18N = True
 
 USE_TZ = True
-
 
 # Static files (CSS, JavaScript, Images)
 # https://docs.djangoproject.com/en/5.2/howto/static-files/
