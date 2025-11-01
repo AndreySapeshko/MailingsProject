@@ -1,0 +1,76 @@
+{% extends "base.html" %}
+{% block title %}Статус кеша{% endblock %}
+
+{% block content %}
+<div class="container mt-4">
+  <h2 class="mb-3">Мониторинг кеша</h2>
+
+  {% if message %}
+    <div class="alert alert-success">{{ message }}</div>
+  {% endif %}
+
+  <form method="post" class="mb-3">
+      {% csrf_token %}
+      <button type="submit" class="btn btn-danger">🧹 Очистить весь кеш</button>
+      <a href="{% url 'home' %}" class="btn btn-secondary ms-2">🏠 На главную</a>
+  </form>
+
+  <p><strong>Ключей в кеше:</strong> <span id="cache-count">{{ count }}</span></p>
+  <table class="table table-sm table-striped" id="cache-table">
+      <thead>
+          <tr>
+              <th>Ключ</th>
+              <th>TTL (сек)</th>
+          </tr>
+      </thead>
+      <tbody>
+          {% for item in keys %}
+          <tr>
+              <td><code>{{ item.key }}</code></td>
+              <td>{{ item.ttl }}</td>
+          </tr>
+          {% empty %}
+          <tr><td colspan="2" class="text-center">Кеш пуст</td></tr>
+          {% endfor %}
+      </tbody>
+  </table>
+
+  <p class="text-muted small mt-3">
+      Последнее обновление: <span id="cache-time">{{ time|date:"H:i:s" }}</span>
+  </p>
+</div>
+
+<script>
+async function updateCacheTable() {
+    try {
+        const response = await fetch("{% url 'core:cache_status_json' %}");
+        if (!response.ok) return;
+
+        const data = await response.json();
+        const tbody = document.querySelector("#cache-table tbody");
+        tbody.innerHTML = "";
+
+        if (data.keys.length === 0) {
+            tbody.innerHTML = `<tr><td colspan="2" class="text-center">Кеш пуст</td></tr>`;
+        } else {
+            data.keys.forEach(item => {
+                const row = `<tr>
+                    <td><code>${item.key}</code></td>
+                    <td>${item.ttl}</td>
+                </tr>`;
+                tbody.insertAdjacentHTML("beforeend", row);
+            });
+        }
+
+        document.getElementById("cache-count").textContent = data.count;
+        document.getElementById("cache-time").textContent = data.time;
+
+    } catch (err) {
+        console.error("Ошибка обновления кеша:", err);
+    }
+}
+
+// 🔄 Обновлять каждые 10 секунд
+setInterval(updateCacheTable, 10000);
+</script>
+{% endblock %}

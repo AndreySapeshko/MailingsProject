@@ -1,0 +1,66 @@
+version: "3.9"
+
+services:
+  web:
+    build: .
+    container_name: mailings_web
+    restart: always
+    env_file: .env
+    command: >
+      sh -c "python manage.py migrate &&
+             python manage.py collectstatic --noinput &&
+             gunicorn mailings_project.wsgi:application --bind 0.0.0.0:8000"
+    ports:
+      - "8000:8000"
+    depends_on:
+      - db
+      - redis
+    volumes:
+      - .:/app
+      - static_data:/app/static
+      - media_data:/app/media
+
+  db:
+    image: postgres:15
+    container_name: mailings_db
+    restart: always
+    environment:
+      POSTGRES_DB: ${DATABASE_NAME}
+      POSTGRES_USER: ${DATABASE_USER}
+      POSTGRES_PASSWORD: ${DATABASE_PASSWORD}
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+    ports:
+      - "${DATABASE_PORT:-5432}:5432"
+
+  redis:
+    image: redis:7
+    container_name: mailings_redis
+    restart: always
+    ports:
+      - "${REDIS_PORT:-6379}:6379"
+
+  celery:
+    build: .
+    container_name: mailings_celery
+    restart: always
+    env_file: .env
+    command: celery -A mailings_project worker -l info
+    depends_on:
+      - db
+      - redis
+
+  celery-beat:
+    build: .
+    container_name: mailings_celery_beat
+    restart: always
+    env_file: .env
+    command: celery -A mailings_project beat -l info
+    depends_on:
+      - db
+      - redis
+
+volumes:
+  postgres_data:
+  static_data:
+  media_data:

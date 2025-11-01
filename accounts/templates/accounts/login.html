@@ -1,0 +1,32 @@
+{% extends 'base.html' %}
+{% block title %}Вход{% endblock %}
+{% block content %}
+<div class="container mt-5 col-md-4">
+    <div class="card shadow-sm p-4">
+        <h3 class="text-center mb-3">Вход в систему</h3>
+        <form method="post">
+            {% csrf_token %}
+            {% for field in form %}
+            <div class="mb-3">
+                <label for="{{ field.id_for_label }}" class="form-label">{{ field.label }}</label>
+                <p id="{{ field.id_for_label }}">{{ field }}</p>
+                {% if field.errors %}
+                <div class="invalid-feedback d-block">
+                    {{ field.errors|striptags }}
+                </div>
+                {% endif %}
+            </div>
+            {% endfor %}
+
+            <div class="text-center mt-3">
+                <button type="submit" class="btn btn-primary w-100">Войти</button>
+            </div>
+        </form>
+        <div class="text-center mt-3">
+            <p class="text-muted small mb-0">
+                Нет аккаунта? <a href="{% url 'accounts:register' %}">Зарегистрироваться</a>
+            </p>
+        </div>
+    </div>
+</div>
+{% endblock %}
