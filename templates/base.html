@@ -1,4 +1,4 @@
-{% load static %}
+{% load static tz %}
 <!DOCTYPE html>
 <html lang="ru">
 <head>
@@ -6,7 +6,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>{% block title %}Mailings Project{% endblock %}</title>
 
-    <!-- Bootstrap CSS -->
+    <!-- Bootstrap CSS  -->
     <link href="{% static 'css/bootstrap.min.css' %}" rel="stylesheet">
 
     <!-- Пользовательские стили -->
@@ -14,7 +14,7 @@
 </head>
 <body class="d-flex flex-column min-vh-100">
 
-<!-- Навигационная панель -->
+<!-- Навигационная панель  -->
 <nav class="navbar navbar-expand-lg navbar-dark bg-dark">
     <div class="container">
         <a class="navbar-brand fw-bold" href="/">Mailings Project</a>
@@ -90,7 +90,7 @@
 <!-- Подвал -->
 <footer class="bg-light py-3 mt-auto border-top">
     <div class="container text-center text-muted small">
-        © {{ now|date:"Y" }} Mailings Project | Разработано Андреем Сапешко
+        © {% now "Y" %} Mailings Project | Разработано Андреем Сапешко
     </div>
 </footer>
 

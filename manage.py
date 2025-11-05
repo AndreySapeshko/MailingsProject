@@ -2,11 +2,20 @@
 """Django's command-line utility for administrative tasks."""
 import os
 import sys
+import environ
+from pathlib import Path
+
+BASE_DIR = Path(__file__).resolve().parent
+
+env = environ.Env()
+env.read_env(BASE_DIR / ".env")
+
+DJANGO_ENV = env("DJANGO_ENV", default="dev")
 
 
 def main():
     """Run administrative tasks."""
-    os.environ.setdefault("DJANGO_SETTINGS_MODULE", "mailings_project.settings.dev")
+    os.environ.setdefault("DJANGO_SETTINGS_MODULE", f"mailings_project.settings.{DJANGO_ENV}")
     try:
         from django.core.management import execute_from_command_line
     except ImportError as exc:

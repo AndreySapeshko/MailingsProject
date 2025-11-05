@@ -12,9 +12,10 @@ https://docs.djangoproject.com/en/5.2/ref/settings/
 
 import os
 import environ
+import logging
 
+from django.conf import settings
 from pathlib import Path
-from dotenv import load_dotenv
 from django.contrib.messages import constants as messages
 
 # load_dotenv()
@@ -114,17 +115,6 @@ ASGI_APPLICATION = 'mailings_project.asgi.application'
 # Database
 # https://docs.djangoproject.com/en/5.2/ref/settings/#databases
 
-DATABASES = {
-    'default': {
-        'ENGINE': 'django.db.backends.postgresql_psycopg2',
-        'NAME': env('DATABASE_NAME', default='mailings_project'),
-        'USER': env('DATABASE_USER', default='postgres'),
-        'PASSWORD': env('DATABASE_PASSWORD', default='postgres'),
-        'HOST': env('DATABASE_HOST', default='db'),
-        'PORT': env('DATABASE_PORT', default='5432'),
-    }
-}
-
 EMAIL_BACKEND = 'django.core.mail.backends.console.EmailBackend'
 DEFAULT_FROM_EMAIL = 'mailings@example.com'
 EMAIL_HOST = env('EMAIL_HOST', default='smtp.example.com')
@@ -193,8 +183,8 @@ REST_FRAMEWORK = {
     'PAGE_SIZE': 10,
 }
 
-REDIS_HOST = os.getenv("REDIS_HOST")
-REDIS_PORT = int(os.getenv("REDIS_PORT"))
+REDIS_HOST = env("REDIS_HOST", default='127.0.0.1')
+REDIS_PORT = env("REDIS_PORT", default=6379)
 CACHES = {
     "default": {
         "BACKEND": "django_redis.cache.RedisCache",
@@ -205,6 +195,17 @@ CACHES = {
         "KEY_PREFIX": "mailings_project",
     }
 }
+
+# Celery broker and backend
+CELERY_BROKER_URL = f"redis://{REDIS_HOST}:{REDIS_PORT}/0"
+CELERY_RESULT_BACKEND = f"redis://{REDIS_HOST}:{REDIS_PORT}/0"
+
+CELERY_ACCEPT_CONTENT = ["json"]
+CELERY_TASK_SERIALIZER = "json"
+CELERY_RESULT_SERIALIZER = "json"
+CELERY_TIMEZONE = "Europe/Moscow"
+CELERY_ENABLE_UTC = False
+
 
 # Internationalization
 # https://docs.djangoproject.com/en/5.2/topics/i18n/
@@ -234,14 +235,59 @@ DEFAULT_AUTO_FIELD = "django.db.models.BigAutoField"
 MEDIA_URL = '/media/'
 MEDIA_ROOT = os.path.join(BASE_DIR, 'media')
 
+LOG_DIR = Path(BASE_DIR) / "logs"
+os.makedirs(LOG_DIR, exist_ok=True)
+
 LOGGING = {
     'version': 1,
     'disable_existing_loggers': False,
-    'handlers': {
-        'console': {'class': 'logging.StreamHandler'},
+    'formatters': {
+        'verbose': {
+            'format': '[{asctime}] {levelname} {name}: {message}',
+            'style': '{',
+        },
+        'simple': {
+            'format': '{levelname}: {message}',
+            'style': '{',
+        },
+        'colored': {
+            'format': '\033[1;32m[{asctime}]\033[0m {levelname} \033[36m{name}\033[0m: {message}',
+            'style': '{',
+        },
     },
-    'root': {
-        'handlers': ['console'],
-        'level': 'INFO',
+    'handlers': {
+        'console': {
+            'class': 'logging.StreamHandler',
+            'formatter': 'colored',
+        },
+        'file_django': {
+            'class': 'logging.FileHandler',
+            'filename': LOG_DIR / 'django.log',
+            'formatter': 'verbose',
+        },
+        'file_celery': {
+            'class': 'logging.FileHandler',
+            'filename': LOG_DIR / 'celery.log',
+            'formatter': 'verbose',
+        },
+    },
+    'loggers': {
+        'django': {
+            'handlers': ['console', 'file_django'],
+            'level': 'DEBUG' if DEBUG else 'INFO',
+            'propagate': True,
+        },
+        'celery': {
+            'handlers': ['console', 'file_celery'],
+            'level': 'INFO',
+            'propagate': False,
+        },
     },
 }
+
+DJANGO_ENV = env("DJANGO_ENV", default="dev")
+
+print(f"\n🧩 Django started with DJANGO_ENV={DJANGO_ENV}, DEBUG={settings.DEBUG}\n")
+
+logging.basicConfig(level=logging.INFO)
+logging.getLogger(__name__).info(f"Environment: {DJANGO_ENV}, DEBUG={settings.DEBUG}")
