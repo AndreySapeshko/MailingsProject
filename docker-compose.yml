@@ -13,6 +13,11 @@ services:
     depends_on:
       - db
       - redis
+    healthcheck:
+      test: [ "CMD", "python", "mailings_project/healthcheck.py" ]
+      interval: 30s
+      timeout: 10s
+      retries: 5
     volumes:
       - .:/app
       - backups:/backups
@@ -52,6 +57,11 @@ services:
     depends_on:
       - redis
       - web
+    healthcheck:
+      test: [ "CMD", "python", "mailings_project/healthcheck.py" ]
+      interval: 30s
+      timeout: 10s
+      retries: 5
     volumes:
       - .:/app
 
