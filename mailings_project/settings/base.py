@@ -60,6 +60,7 @@ INSTALLED_APPS = [
     "users",
     "core",
     'rest_framework',
+    'celery_app',
 ]
 
 MIDDLEWARE = [
@@ -183,7 +184,7 @@ REST_FRAMEWORK = {
     'PAGE_SIZE': 10,
 }
 
-REDIS_HOST = env("REDIS_HOST", default='127.0.0.1')
+REDIS_HOST = env("REDIS_HOST", default='redis')
 REDIS_PORT = env("REDIS_PORT", default=6379)
 CACHES = {
     "default": {
@@ -195,17 +196,6 @@ CACHES = {
         "KEY_PREFIX": "mailings_project",
     }
 }
-
-# Celery broker and backend
-CELERY_BROKER_URL = f"redis://{REDIS_HOST}:{REDIS_PORT}/0"
-CELERY_RESULT_BACKEND = f"redis://{REDIS_HOST}:{REDIS_PORT}/0"
-
-CELERY_ACCEPT_CONTENT = ["json"]
-CELERY_TASK_SERIALIZER = "json"
-CELERY_RESULT_SERIALIZER = "json"
-CELERY_TIMEZONE = "Europe/Moscow"
-CELERY_ENABLE_UTC = False
-
 
 # Internationalization
 # https://docs.djangoproject.com/en/5.2/topics/i18n/
@@ -235,55 +225,65 @@ DEFAULT_AUTO_FIELD = "django.db.models.BigAutoField"
 MEDIA_URL = '/media/'
 MEDIA_ROOT = os.path.join(BASE_DIR, 'media')
 
+# Celery broker and backend
+CELERY_BROKER_URL = f"redis://{REDIS_HOST}:{REDIS_PORT}/0"
+CELERY_BROKER_CONNECTION_RETRY_ON_STARTUP = True
+CELERY_RESULT_BACKEND = "django-db"
+CELERY_CACHE_BACKEND = "default"
+CELERY_ACCEPT_CONTENT = ["json"]
+CELERY_TASK_SERIALIZER = "json"
+CELERY_RESULT_SERIALIZER = "json"
+CELERY_TIMEZONE = TIME_ZONE
+CELERY_TASK_TRACK_STARTED = True
+CELERY_TASK_TIME_LIMIT = 30 * 60
+
 LOG_DIR = Path(BASE_DIR) / "logs"
 os.makedirs(LOG_DIR, exist_ok=True)
 
+
 LOGGING = {
-    'version': 1,
-    'disable_existing_loggers': False,
-    'formatters': {
-        'verbose': {
-            'format': '[{asctime}] {levelname} {name}: {message}',
-            'style': '{',
+    "version": 1,
+    "disable_existing_loggers": False,
+    "formatters": {
+        "verbose": {
+            "format": "[{asctime}] [{levelname}] {name}: {message}",
+            "style": "{",
         },
-        'simple': {
-            'format': '{levelname}: {message}',
-            'style': '{',
-        },
-        'colored': {
-            'format': '\033[1;32m[{asctime}]\033[0m {levelname} \033[36m{name}\033[0m: {message}',
-            'style': '{',
+        "simple": {
+            "format": "{levelname} {message}",
+            "style": "{",
         },
     },
-    'handlers': {
-        'console': {
-            'class': 'logging.StreamHandler',
-            'formatter': 'colored',
-        },
-        'file_django': {
-            'class': 'logging.FileHandler',
-            'filename': LOG_DIR / 'django.log',
-            'formatter': 'verbose',
-        },
-        'file_celery': {
-            'class': 'logging.FileHandler',
-            'filename': LOG_DIR / 'celery.log',
-            'formatter': 'verbose',
+    "handlers": {
+        "console": {
+            "class": "logging.StreamHandler",
+            "formatter": "verbose",
         },
     },
-    'loggers': {
-        'django': {
-            'handlers': ['console', 'file_django'],
-            'level': 'DEBUG' if DEBUG else 'INFO',
-            'propagate': True,
+    "root": {  # всё, у чего нет своего логгера
+        "handlers": ["console"],
+        "level": "INFO",
+    },
+    "loggers": {
+        "django": {
+            "handlers": ["console"],
+            "level": "INFO",
+            "propagate": True,
         },
-        'celery': {
-            'handlers': ['console', 'file_celery'],
-            'level': 'INFO',
-            'propagate': False,
+        "celery": {
+            "handlers": ["console"],
+            "level": "INFO",
+            "propagate": True,
         },
+        # если хочешь отладку запросов к БД:
+        # "django.db.backends": {
+        #     "handlers": ["console"],
+        #     "level": "WARNING",
+        #     "propagate": False,
+        # },
     },
 }
+
 
 DJANGO_ENV = env("DJANGO_ENV", default="dev")
 

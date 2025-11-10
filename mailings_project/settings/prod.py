@@ -32,6 +32,13 @@ DATABASES = {
 REDIS_HOST = env('REDIS_HOST', default='redis')
 REDIS_PORT = env('REDIS_PORT', default='6379')
 
+
 CELERY_BROKER_URL = f'redis://{REDIS_HOST}:{REDIS_PORT}/0'
 CELERY_RESULT_BACKEND = f'redis://{REDIS_HOST}:{REDIS_PORT}/0'
-
+from celery.schedules import crontab
+CELERY_BEAT_SCHEDULE = {
+    'process-mailings-every-minute': {
+        'task': 'mailings.tasks.process_mailings',
+        'schedule': crontab(minute='*'),
+    },
+}
