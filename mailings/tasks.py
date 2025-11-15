@@ -34,11 +34,11 @@ def process_mailings():
         except Exception as e:
             logger.exception(f"❌ Ошибка при обработке рассылки {mailing.id}: {e}")
 
-# @shared_task
-# def ping_celery():
-#     print("🔥 ping_celery() started (print)")
-#     logger.info("🔥 ping_celery() started (logger)")
-#     msg = "🔥 ping_celery() executed!\n"
-#     Path("/tmp/celery_test.txt").write_text(msg)
-#     print(msg)
-#     return "pong"
+@shared_task
+def ping_celery():
+    print("🔥 ping_celery() started (print)")
+    logger.info("🔥 ping_celery() started (logger)")
+    msg = "🔥 ping_celery() executed!\n"
+    Path("/tmp/celery_test.txt").write_text(msg)
+    print(msg)
+    return "pong"

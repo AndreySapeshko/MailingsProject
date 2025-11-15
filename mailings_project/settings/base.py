@@ -172,6 +172,7 @@ MESSAGE_TAGS = {
 }
 
 REST_FRAMEWORK = {
+    'DEFAULT_SCHEMA_CLASS': 'drf_spectacular.openapi.AutoSchema',
     'DEFAULT_AUTHENTICATION_CLASSES': [
         'rest_framework.authentication.SessionAuthentication',
         # позже добавим JWT:
@@ -236,6 +237,14 @@ CELERY_RESULT_SERIALIZER = "json"
 CELERY_TIMEZONE = TIME_ZONE
 CELERY_TASK_TRACK_STARTED = True
 CELERY_TASK_TIME_LIMIT = 30 * 60
+
+INSTALLED_APPS += ["drf_spectacular"]
+
+SPECTACULAR_SETTINGS = {
+    "TITLE": "Mailings API",
+    "DESCRIPTION": "Документация API для сервиса рассылок",
+    "VERSION": "1.0.0",
+}
 
 LOG_DIR = Path(BASE_DIR) / "logs"
 os.makedirs(LOG_DIR, exist_ok=True)
