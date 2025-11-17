@@ -6,6 +6,7 @@ class Recipient(models.Model):
     email = models.EmailField(unique=True, verbose_name='email')
     name = models.CharField(max_length=100, verbose_name='ФИО')
     comment = models.TextField(blank=True, null=True, verbose_name='Комментарий')
+    is_active = models.BooleanField(default=True)
     user = models.ForeignKey(
         settings.AUTH_USER_MODEL,
         on_delete=models.CASCADE,

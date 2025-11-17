@@ -78,11 +78,14 @@ class Mailing(models.Model):
     recipients = models.ManyToManyField(Recipient, related_name='mailings')
     message = models.ForeignKey(Message, on_delete=models.CASCADE, related_name='mailings')
 
+    def get_recipients(self):
+        return self.recipients.filter(is_active=True)
+
     def send_now(self):
         """Отправка рассылки вручную"""
 
         sent_count = 0
-        for recipient in self.recipients.all():
+        for recipient in self.get_recipients():
             try:
                 send_mail(
                     subject=self.message.subject,

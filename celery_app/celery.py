@@ -25,7 +25,7 @@ print(f"📦 Backend: {app.conf.result_backend}")
 
 app.config_from_object('django.conf:settings', namespace='CELERY')
 
-django.setup()
+# django.setup()
 from django.conf import settings
 logging.config.dictConfig(settings.LOGGING)
 

@@ -21,6 +21,7 @@ from django.urls import path, include
 from django.conf import settings
 from django.conf.urls.static import static
 from mailings.views.home_view import HomeView
+from drf_spectacular.views import SpectacularAPIView, SpectacularSwaggerView
 
 urlpatterns = [
     path('', HomeView.as_view(), name='home'),
@@ -31,6 +32,11 @@ urlpatterns = [
     path('users/', include('users.urls', namespace='users')),
     path('api/', include('api.urls', namespace='api')),
     path('core/', include('core.urls', namespace='core')),
+]
+
+urlpatterns += [
+    path("api/schema/", SpectacularAPIView.as_view(), name="schema"),
+    path("api/docs/", SpectacularSwaggerView.as_view(url_name="schema")),
 ]
 
 if settings.DEBUG:
