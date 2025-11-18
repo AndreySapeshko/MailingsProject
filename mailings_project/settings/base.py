@@ -161,7 +161,7 @@ ROLE_ACCESS = {
     'users': ['admin'],  # например, просмотр всех пользователей
 }
 
-ALLOW_VIEW_ONLY_ROLES = ['manager']
+ALLOW_VIEW_ONLY_ROLES = ['manager', 'user']
 
 MESSAGE_TAGS = {
     messages.DEBUG: 'secondary',
