@@ -16,6 +16,9 @@ class CustomUser(AbstractUser):
         verbose_name='Роль'
     )
 
+    def is_user(self):
+        return self.role == self.Roles.USER
+
     def is_manager(self):
         return self.role == self.Roles.MANAGER
 

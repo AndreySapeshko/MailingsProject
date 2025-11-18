@@ -1,7 +1,10 @@
+import logging
 from rest_framework.permissions import BasePermission, SAFE_METHODS
 from django.conf import settings
 from django.contrib.auth import get_user_model
 from functools import lru_cache
+
+logger = logging.getLogger('django')
 
 User = get_user_model()
 
@@ -41,16 +44,14 @@ class RoleBasedAccessPermission(BasePermission):
         if user.is_superuser:
             return True
 
-        # 3 Определяем разрешённые роли для приложения
-        model = getattr(getattr(view, "queryset", None), "model", None)
-        if model:
-            app_label = model._meta.app_label
-            allowed_roles = self.get_allowed_roles(app_label)
-            if user.role in allowed_roles:
+        if request.method in ["POST", "PUT", "PATCH", "DELETE"]:
+            if user.role == "admin":
                 return True
+            if user.role == "user":
+                return True  # проверка владения в has_object_permission
+            return False
 
-        # 4 Разрешаем просмотр read-only ролям
-        if request.method in SAFE_METHODS and user.role in self.get_view_only_roles():
+        if request.method in SAFE_METHODS:
             return True
 
         return False
@@ -76,4 +77,5 @@ class RoleBasedAccessPermission(BasePermission):
         model = getattr(view, "queryset", None).model
         app_label = model._meta.app_label if model else None
         allowed_roles = self.get_allowed_roles(app_label)
+        logger.info('Роль пользователя не подошла для доступа')
         return user.role in allowed_roles

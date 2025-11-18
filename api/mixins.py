@@ -1,3 +1,5 @@
+import os
+
 from django.core.cache import cache
 from api.utils.cache import cache_response
 from api.permissions import RoleBasedAccessPermission
@@ -18,6 +20,11 @@ class BaseCachedViewSetMixin:
     cache_prefix = "api"
     cache_timeout = 300
 
+    if os.environ.get("DISABLE_API_CACHE") == "1":
+        cache_enabled = False
+    else:
+        cache_enabled = True
+
     def get_queryset(self):
         user = self.request.user
         qs = super().get_queryset()
@@ -27,6 +34,9 @@ class BaseCachedViewSetMixin:
 
     def list(self, request, *args, **kwargs):
         """Кеширование списка"""
+
+        if not self.cache_enabled:
+            return super().list(request, *args, **kwargs)
         prefix = self.cache_prefix or "api"
         timeout = self.cache_timeout or 300
         cached_func = universal_cache(prefix=prefix, timeout=timeout)(super().list)
@@ -34,6 +44,9 @@ class BaseCachedViewSetMixin:
 
     def retrieve(self, request, *args, **kwargs):
         """Кеширование детального просмотра"""
+
+        if not self.cache_enabled:
+            return super().retrieve(request, *args, **kwargs)
         prefix = self.cache_prefix or "api"
         timeout = self.cache_timeout or 300
         cached_func = universal_cache(prefix=prefix, timeout=timeout)(super().retrieve)

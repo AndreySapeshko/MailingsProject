@@ -10,3 +10,5 @@ class MailingViewSet(BaseCachedViewSetMixin, viewsets.ModelViewSet):
     queryset = Mailing.objects.all()
     serializer_class = MailingSerializer
 
+    def perform_create(self, serializer):
+        serializer.save(user=self.request.user)
