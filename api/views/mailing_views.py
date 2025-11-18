@@ -7,6 +7,14 @@ from api.permissions import RoleBasedAccessPermission
 from core.decorators import universal_cache
 
 class MailingViewSet(BaseCachedViewSetMixin, viewsets.ModelViewSet):
+    """
+        API endpoint for managing email mailings.
+
+        - Только пользователь-владелец может изменять данные
+        - Менеджер может только просматривать
+        - Администратор имеет полный доступ
+        """
+
     queryset = Mailing.objects.all()
     serializer_class = MailingSerializer
 

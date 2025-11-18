@@ -7,6 +7,14 @@ from api.permissions import RoleBasedAccessPermission
 
 
 class RecipientViewSet(BaseCachedViewSetMixin, viewsets.ModelViewSet):
+    """
+        API endpoint for managing email recipients.
+
+        - Только пользователь-владелец может изменять данные
+        - Менеджер может только просматривать
+        - Администратор имеет полный доступ
+        """
+
     queryset = Recipient.objects.all()
     serializer_class = RecipientSerializer
 

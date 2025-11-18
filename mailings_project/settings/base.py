@@ -241,9 +241,10 @@ CELERY_TASK_TIME_LIMIT = 30 * 60
 INSTALLED_APPS += ["drf_spectacular"]
 
 SPECTACULAR_SETTINGS = {
-    "TITLE": "Mailings API",
-    "DESCRIPTION": "Документация API для сервиса рассылок",
-    "VERSION": "1.0.0",
+    'TITLE': 'Mailings Service API',
+    'DESCRIPTION': 'Сервис email-рассылок с планировщиком и ролями доступа',
+    'VERSION': '1.0.0',
+    'SERVE_INCLUDE_SCHEMA': False,
 }
 
 LOG_DIR = Path(BASE_DIR) / "logs"

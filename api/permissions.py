@@ -63,6 +63,9 @@ class RoleBasedAccessPermission(BasePermission):
         if user.is_superuser:
             return True
 
+        if user.is_admin:
+            return True
+
         # 2 Разрешён просмотр для read-only ролей
         if request.method in SAFE_METHODS and user.role in self.get_view_only_roles():
             return True
@@ -77,5 +80,4 @@ class RoleBasedAccessPermission(BasePermission):
         model = getattr(view, "queryset", None).model
         app_label = model._meta.app_label if model else None
         allowed_roles = self.get_allowed_roles(app_label)
-        logger.info('Роль пользователя не подошла для доступа')
         return user.role in allowed_roles

@@ -7,5 +7,16 @@ from api.permissions import RoleBasedAccessPermission
 
 
 class MessageViewSet(BaseCachedViewSetMixin, viewsets.ModelViewSet):
+    """
+        API endpoint for managing email messages.
+
+        - Только пользователь-владелец может изменять данные
+        - Менеджер может только просматривать
+        - Администратор имеет полный доступ
+        """
+
     queryset = Message.objects.all()
     serializer_class = MessageSerializer
+
+    def perform_create(self, serializer):
+        serializer.save(user=self.request.user)
