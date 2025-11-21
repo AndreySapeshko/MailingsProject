@@ -51,3 +51,34 @@ def test_process_mailings_handles_exceptions(mocker):
     # Задача должна выполниться и НЕ упасть
     result.get(timeout=10)
     assert result.successful()
+
+
+@pytest.mark.django_db(transaction=True)
+def test_process_mailings_handles_exceptions(mocker):
+    """Проверяет, что при ошибке внутри send_now задача не падает."""
+
+    # Создаём рассылку, которая должна быть обработана
+    mailing = MailingFactory(status="started")
+
+    # Мокаем send_now так, чтобы он кидал исключение
+    mocker.patch(
+        "mailings.models.Mailing.send_now",
+        side_effect=Exception("boom")
+    )
+
+    # Запускаем задачу Celery
+    result = process_mailings.delay()
+
+    # Задача должна выполниться и НЕ упасть
+    result.get(timeout=10)
+    assert result.successful()
+
+
+@pytest.mark.django_db
+def test_run_mailing_tasks_calls_process_mailings_delay(mocker):
+    delay_mock = mocker.patch("mailings.tasks.process_mailings.delay")
+
+    from scheduler.tasks import run_mailing_tasks
+    run_mailing_tasks()
+
+    delay_mock.assert_called_once_with()

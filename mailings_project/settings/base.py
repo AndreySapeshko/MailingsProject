@@ -61,6 +61,7 @@ INSTALLED_APPS = [
     "core",
     'rest_framework',
     'celery_app',
+    'healthcheck',
 ]
 
 MIDDLEWARE = [

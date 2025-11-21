@@ -1,0 +1,812 @@
+openapi: 3.0.3
+info:
+  title: Mailings Service API
+  version: 1.0.0
+  description: Сервис email-рассылок с планировщиком и ролями доступа
+paths:
+  /api/mailings/:
+    get:
+      operationId: mailings_list
+      description: Кеширование списка
+      parameters:
+      - name: page
+        required: false
+        in: query
+        description: A page number within the paginated result set.
+        schema:
+          type: integer
+      tags:
+      - mailings
+      security:
+      - cookieAuth: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/PaginatedMailingList'
+          description: ''
+    post:
+      operationId: mailings_create
+      description: |-
+        API endpoint for managing email mailings.
+
+        - Только пользователь-владелец может изменять данные
+        - Менеджер может только просматривать
+        - Администратор имеет полный доступ
+      tags:
+      - mailings
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/Mailing'
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: '#/components/schemas/Mailing'
+          multipart/form-data:
+            schema:
+              $ref: '#/components/schemas/Mailing'
+        required: true
+      security:
+      - cookieAuth: []
+      responses:
+        '201':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Mailing'
+          description: ''
+  /api/mailings/{id}/:
+    get:
+      operationId: mailings_retrieve
+      description: Кеширование детального просмотра
+      parameters:
+      - in: path
+        name: id
+        schema:
+          type: integer
+        description: A unique integer value identifying this Рассылка.
+        required: true
+      tags:
+      - mailings
+      security:
+      - cookieAuth: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Mailing'
+          description: ''
+    put:
+      operationId: mailings_update
+      description: |-
+        API endpoint for managing email mailings.
+
+        - Только пользователь-владелец может изменять данные
+        - Менеджер может только просматривать
+        - Администратор имеет полный доступ
+      parameters:
+      - in: path
+        name: id
+        schema:
+          type: integer
+        description: A unique integer value identifying this Рассылка.
+        required: true
+      tags:
+      - mailings
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/Mailing'
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: '#/components/schemas/Mailing'
+          multipart/form-data:
+            schema:
+              $ref: '#/components/schemas/Mailing'
+        required: true
+      security:
+      - cookieAuth: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Mailing'
+          description: ''
+    patch:
+      operationId: mailings_partial_update
+      description: |-
+        API endpoint for managing email mailings.
+
+        - Только пользователь-владелец может изменять данные
+        - Менеджер может только просматривать
+        - Администратор имеет полный доступ
+      parameters:
+      - in: path
+        name: id
+        schema:
+          type: integer
+        description: A unique integer value identifying this Рассылка.
+        required: true
+      tags:
+      - mailings
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/PatchedMailing'
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: '#/components/schemas/PatchedMailing'
+          multipart/form-data:
+            schema:
+              $ref: '#/components/schemas/PatchedMailing'
+      security:
+      - cookieAuth: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Mailing'
+          description: ''
+    delete:
+      operationId: mailings_destroy
+      description: |-
+        API endpoint for managing email mailings.
+
+        - Только пользователь-владелец может изменять данные
+        - Менеджер может только просматривать
+        - Администратор имеет полный доступ
+      parameters:
+      - in: path
+        name: id
+        schema:
+          type: integer
+        description: A unique integer value identifying this Рассылка.
+        required: true
+      tags:
+      - mailings
+      security:
+      - cookieAuth: []
+      responses:
+        '204':
+          description: No response body
+  /api/messages/:
+    get:
+      operationId: messages_list
+      description: Кеширование списка
+      parameters:
+      - name: page
+        required: false
+        in: query
+        description: A page number within the paginated result set.
+        schema:
+          type: integer
+      tags:
+      - messages
+      security:
+      - cookieAuth: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/PaginatedMessageList'
+          description: ''
+    post:
+      operationId: messages_create
+      description: |-
+        API endpoint for managing email messages.
+
+        - Только пользователь-владелец может изменять данные
+        - Менеджер может только просматривать
+        - Администратор имеет полный доступ
+      tags:
+      - messages
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/Message'
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: '#/components/schemas/Message'
+          multipart/form-data:
+            schema:
+              $ref: '#/components/schemas/Message'
+        required: true
+      security:
+      - cookieAuth: []
+      responses:
+        '201':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Message'
+          description: ''
+  /api/messages/{id}/:
+    get:
+      operationId: messages_retrieve
+      description: Кеширование детального просмотра
+      parameters:
+      - in: path
+        name: id
+        schema:
+          type: integer
+        description: A unique integer value identifying this Сообщение.
+        required: true
+      tags:
+      - messages
+      security:
+      - cookieAuth: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Message'
+          description: ''
+    put:
+      operationId: messages_update
+      description: |-
+        API endpoint for managing email messages.
+
+        - Только пользователь-владелец может изменять данные
+        - Менеджер может только просматривать
+        - Администратор имеет полный доступ
+      parameters:
+      - in: path
+        name: id
+        schema:
+          type: integer
+        description: A unique integer value identifying this Сообщение.
+        required: true
+      tags:
+      - messages
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/Message'
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: '#/components/schemas/Message'
+          multipart/form-data:
+            schema:
+              $ref: '#/components/schemas/Message'
+        required: true
+      security:
+      - cookieAuth: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Message'
+          description: ''
+    patch:
+      operationId: messages_partial_update
+      description: |-
+        API endpoint for managing email messages.
+
+        - Только пользователь-владелец может изменять данные
+        - Менеджер может только просматривать
+        - Администратор имеет полный доступ
+      parameters:
+      - in: path
+        name: id
+        schema:
+          type: integer
+        description: A unique integer value identifying this Сообщение.
+        required: true
+      tags:
+      - messages
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/PatchedMessage'
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: '#/components/schemas/PatchedMessage'
+          multipart/form-data:
+            schema:
+              $ref: '#/components/schemas/PatchedMessage'
+      security:
+      - cookieAuth: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Message'
+          description: ''
+    delete:
+      operationId: messages_destroy
+      description: |-
+        API endpoint for managing email messages.
+
+        - Только пользователь-владелец может изменять данные
+        - Менеджер может только просматривать
+        - Администратор имеет полный доступ
+      parameters:
+      - in: path
+        name: id
+        schema:
+          type: integer
+        description: A unique integer value identifying this Сообщение.
+        required: true
+      tags:
+      - messages
+      security:
+      - cookieAuth: []
+      responses:
+        '204':
+          description: No response body
+  /api/recipients/:
+    get:
+      operationId: recipients_list
+      description: Кеширование списка
+      parameters:
+      - name: page
+        required: false
+        in: query
+        description: A page number within the paginated result set.
+        schema:
+          type: integer
+      tags:
+      - recipients
+      security:
+      - cookieAuth: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/PaginatedRecipientList'
+          description: ''
+    post:
+      operationId: recipients_create
+      description: |-
+        API endpoint for managing email recipients.
+
+        - Только пользователь-владелец может изменять данные
+        - Менеджер может только просматривать
+        - Администратор имеет полный доступ
+      tags:
+      - recipients
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/Recipient'
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: '#/components/schemas/Recipient'
+          multipart/form-data:
+            schema:
+              $ref: '#/components/schemas/Recipient'
+        required: true
+      security:
+      - cookieAuth: []
+      responses:
+        '201':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Recipient'
+          description: ''
+  /api/recipients/{id}/:
+    get:
+      operationId: recipients_retrieve
+      description: Кеширование детального просмотра
+      parameters:
+      - in: path
+        name: id
+        schema:
+          type: integer
+        description: A unique integer value identifying this Получатель.
+        required: true
+      tags:
+      - recipients
+      security:
+      - cookieAuth: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Recipient'
+          description: ''
+    put:
+      operationId: recipients_update
+      description: |-
+        API endpoint for managing email recipients.
+
+        - Только пользователь-владелец может изменять данные
+        - Менеджер может только просматривать
+        - Администратор имеет полный доступ
+      parameters:
+      - in: path
+        name: id
+        schema:
+          type: integer
+        description: A unique integer value identifying this Получатель.
+        required: true
+      tags:
+      - recipients
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/Recipient'
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: '#/components/schemas/Recipient'
+          multipart/form-data:
+            schema:
+              $ref: '#/components/schemas/Recipient'
+        required: true
+      security:
+      - cookieAuth: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Recipient'
+          description: ''
+    patch:
+      operationId: recipients_partial_update
+      description: |-
+        API endpoint for managing email recipients.
+
+        - Только пользователь-владелец может изменять данные
+        - Менеджер может только просматривать
+        - Администратор имеет полный доступ
+      parameters:
+      - in: path
+        name: id
+        schema:
+          type: integer
+        description: A unique integer value identifying this Получатель.
+        required: true
+      tags:
+      - recipients
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/PatchedRecipient'
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: '#/components/schemas/PatchedRecipient'
+          multipart/form-data:
+            schema:
+              $ref: '#/components/schemas/PatchedRecipient'
+      security:
+      - cookieAuth: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Recipient'
+          description: ''
+    delete:
+      operationId: recipients_destroy
+      description: |-
+        API endpoint for managing email recipients.
+
+        - Только пользователь-владелец может изменять данные
+        - Менеджер может только просматривать
+        - Администратор имеет полный доступ
+      parameters:
+      - in: path
+        name: id
+        schema:
+          type: integer
+        description: A unique integer value identifying this Получатель.
+        required: true
+      tags:
+      - recipients
+      security:
+      - cookieAuth: []
+      responses:
+        '204':
+          description: No response body
+components:
+  schemas:
+    Mailing:
+      type: object
+      properties:
+        id:
+          type: integer
+          readOnly: true
+        name:
+          type: string
+          title: Название
+          maxLength: 100
+        date_first_dispatch:
+          type: string
+          format: date-time
+          title: Дата первой отправки
+        dispatch_end_date:
+          type: string
+          format: date-time
+          title: Дата окончания отправки
+        periodicity:
+          allOf:
+          - $ref: '#/components/schemas/PeriodicityEnum'
+          title: Периодичность
+        status:
+          allOf:
+          - $ref: '#/components/schemas/StatusEnum'
+          readOnly: true
+          title: Статус
+        created_at:
+          type: string
+          format: date-time
+          readOnly: true
+        updated_at:
+          type: string
+          format: date-time
+          readOnly: true
+        user:
+          type: integer
+          readOnly: true
+        message:
+          type: integer
+        recipients:
+          type: array
+          items:
+            type: integer
+      required:
+      - created_at
+      - date_first_dispatch
+      - dispatch_end_date
+      - id
+      - message
+      - name
+      - recipients
+      - status
+      - updated_at
+      - user
+    Message:
+      type: object
+      properties:
+        id:
+          type: integer
+          readOnly: true
+        subject:
+          type: string
+          maxLength: 200
+        body:
+          type: string
+        created_at:
+          type: string
+          format: date-time
+          readOnly: true
+        user:
+          type: integer
+          readOnly: true
+      required:
+      - body
+      - created_at
+      - id
+      - subject
+      - user
+    PaginatedMailingList:
+      type: object
+      required:
+      - count
+      - results
+      properties:
+        count:
+          type: integer
+          example: 123
+        next:
+          type: string
+          nullable: true
+          format: uri
+          example: http://api.example.org/accounts/?page=4
+        previous:
+          type: string
+          nullable: true
+          format: uri
+          example: http://api.example.org/accounts/?page=2
+        results:
+          type: array
+          items:
+            $ref: '#/components/schemas/Mailing'
+    PaginatedMessageList:
+      type: object
+      required:
+      - count
+      - results
+      properties:
+        count:
+          type: integer
+          example: 123
+        next:
+          type: string
+          nullable: true
+          format: uri
+          example: http://api.example.org/accounts/?page=4
+        previous:
+          type: string
+          nullable: true
+          format: uri
+          example: http://api.example.org/accounts/?page=2
+        results:
+          type: array
+          items:
+            $ref: '#/components/schemas/Message'
+    PaginatedRecipientList:
+      type: object
+      required:
+      - count
+      - results
+      properties:
+        count:
+          type: integer
+          example: 123
+        next:
+          type: string
+          nullable: true
+          format: uri
+          example: http://api.example.org/accounts/?page=4
+        previous:
+          type: string
+          nullable: true
+          format: uri
+          example: http://api.example.org/accounts/?page=2
+        results:
+          type: array
+          items:
+            $ref: '#/components/schemas/Recipient'
+    PatchedMailing:
+      type: object
+      properties:
+        id:
+          type: integer
+          readOnly: true
+        name:
+          type: string
+          title: Название
+          maxLength: 100
+        date_first_dispatch:
+          type: string
+          format: date-time
+          title: Дата первой отправки
+        dispatch_end_date:
+          type: string
+          format: date-time
+          title: Дата окончания отправки
+        periodicity:
+          allOf:
+          - $ref: '#/components/schemas/PeriodicityEnum'
+          title: Периодичность
+        status:
+          allOf:
+          - $ref: '#/components/schemas/StatusEnum'
+          readOnly: true
+          title: Статус
+        created_at:
+          type: string
+          format: date-time
+          readOnly: true
+        updated_at:
+          type: string
+          format: date-time
+          readOnly: true
+        user:
+          type: integer
+          readOnly: true
+        message:
+          type: integer
+        recipients:
+          type: array
+          items:
+            type: integer
+    PatchedMessage:
+      type: object
+      properties:
+        id:
+          type: integer
+          readOnly: true
+        subject:
+          type: string
+          maxLength: 200
+        body:
+          type: string
+        created_at:
+          type: string
+          format: date-time
+          readOnly: true
+        user:
+          type: integer
+          readOnly: true
+    PatchedRecipient:
+      type: object
+      properties:
+        id:
+          type: integer
+          readOnly: true
+        email:
+          type: string
+          format: email
+          maxLength: 254
+        name:
+          type: string
+          title: ФИО
+          maxLength: 100
+        comment:
+          type: string
+          nullable: true
+          title: Комментарий
+        is_active:
+          type: boolean
+        user:
+          type: integer
+          readOnly: true
+    PeriodicityEnum:
+      enum:
+      - once
+      - daily
+      - weekly
+      type: string
+      description: |-
+        * `once` - Один раз
+        * `daily` - Каждый день
+        * `weekly` - Раз в неделю
+    Recipient:
+      type: object
+      properties:
+        id:
+          type: integer
+          readOnly: true
+        email:
+          type: string
+          format: email
+          maxLength: 254
+        name:
+          type: string
+          title: ФИО
+          maxLength: 100
+        comment:
+          type: string
+          nullable: true
+          title: Комментарий
+        is_active:
+          type: boolean
+        user:
+          type: integer
+          readOnly: true
+      required:
+      - email
+      - id
+      - name
+      - user
+    StatusEnum:
+      enum:
+      - created
+      - launched
+      - completed
+      - stopped
+      type: string
+      description: |-
+        * `created` - Создана
+        * `launched` - Запущена
+        * `completed` - Завершена
+        * `stopped` - Остановлена
+  securitySchemes:
+    cookieAuth:
+      type: apiKey
+      in: cookie
+      name: sessionid
