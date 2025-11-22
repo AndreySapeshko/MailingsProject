@@ -1,0 +1,99 @@
+services:
+  web:
+    build: .
+    container_name: mailings_web
+    restart: always
+    env_file: .env
+    command: >
+      sh -c "python manage.py migrate &&
+             python manage.py collectstatic --noinput &&
+             gunicorn mailings_project.wsgi:application --bind 0.0.0.0:8000 --timeout 120"
+    ports:
+      - "8000:8000"
+    depends_on:
+      db:
+        condition: service_healthy
+      redis:
+        condition: service_healthy
+    healthcheck:
+      test: [ "CMD", "python", "mailings_project/healthcheck.py" ]
+      interval: 30s
+      timeout: 10s
+      retries: 5
+    volumes:
+      - .:/app
+      - backups:/backups
+      - static_volume:/app/staticfiles
+      - media_data:/app/media
+      - ./scripts:/app/scripts
+
+  db:
+    image: postgres:15
+    env_file:
+      - ./.env
+    container_name: mailings_db
+    restart: always
+    environment:
+      POSTGRES_DB: ${DATABASE_NAME}
+      POSTGRES_USER: ${DATABASE_USER}
+      POSTGRES_PASSWORD: ${DATABASE_PASSWORD}
+    healthcheck:
+      test: [ "CMD-SHELL", "pg_isready -U ${DATABASE_USER} -d ${DATABASE_NAME}" ]
+      interval: 30s
+      timeout: 10s
+      retries: 5
+      start_period: 30s
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+      - ./backups:/backups
+      - ./scripts:/app/scripts
+    ports:
+      - "${DATABASE_PORT:-5432}:5432"
+
+  redis:
+    image: redis:7
+    container_name: mailings_redis
+    restart: always
+    healthcheck:
+      test: [ "CMD", "redis-cli", "ping" ]
+      interval: 10s
+      timeout: 3s
+      retries: 5
+      start_period: 10s
+    ports:
+      - "${REDIS_PORT:-6379}:6379"
+
+  celery:
+    build: .
+    command: celery -A celery_app.celery worker -l info
+    restart: always
+    env_file: .env
+    depends_on:
+      db:
+        condition: service_healthy
+      redis:
+        condition: service_healthy
+    healthcheck:
+      test: [ "CMD", "python", "mailings_project/healthcheck.py" ]
+      interval: 30s
+      timeout: 10s
+      retries: 5
+    volumes:
+      - .:/app
+
+  celery-beat:
+    build: .
+    command: celery -A celery_app.celery beat -l info
+    restart: always
+    env_file: .env
+    depends_on:
+      - redis
+      - web
+    volumes:
+      - .:/app
+
+volumes:
+  postgres_data:
+  static_volume:
+  media_data:
+  backups:
