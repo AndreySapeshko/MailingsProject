@@ -296,3 +296,194 @@ rbac/ – тесты прав доступа для разных ролей
 
 `health`:
 \tdocker compose exec web python mailings_project/healthcheck.py
+
+
+---
+
+# 🚀 Деплой (Production Deployment)
+
+Проект поддерживает полноценный production-деплой с использованием:
+
+* **Docker + Docker Compose**
+* **Gunicorn**
+* **Nginx**
+* **PostgreSQL**
+* **Redis**
+* **Celery + Celery Beat**
+* **Статических файлов на volume**
+
+Ниже — пошаговая инструкция.
+
+---
+
+## 1. 📁 Структура папок
+
+Проект ожидает следующую структуру:
+
+```
+MailingsProject/
+│
+├── deploy/
+│   ├── docker-compose.prod.yml
+│   ├── nginx.conf
+│   ├── entrypoint.sh
+│   └── .env
+│
+├── Dockerfile.prod
+├── requirements.txt
+└── ...
+```
+
+⚠️ **Важно:** переменные окружения должны быть в `deploy/.env`.
+
+---
+
+## 2. ⚙️ Файл окружения `.env`
+
+Пример содержимого:
+
+```
+DJANGO_ENV=prod
+DEBUG=False
+SECRET_KEY=your-production-secret-key
+
+DATABASE_NAME=mailings_project
+DATABASE_USER=postgres_user
+DATABASE_PASSWORD=postgres_pass
+DATABASE_HOST=db
+DATABASE_PORT=5432
+
+REDIS_HOST=redis
+REDIS_PORT=6379
+```
+
+---
+
+## 3. 🧱 Сборка Production-образа
+
+Перейдите в директорию `deploy/`:
+
+```bash
+cd deploy
+```
+
+Чтобы собрать образы:
+
+```bash
+docker compose --env-file .env -f docker-compose.prod.yml build
+```
+
+(или **с чистого листа**)
+
+```bash
+docker compose --env-file .env -f docker-compose.prod.yml build --no-cache
+```
+
+---
+
+## 4. 🚀 Запуск проекта
+
+```bash
+docker compose --env-file .env -f docker-compose.prod.yml up -d
+```
+
+Проверить статус:
+
+```bash
+docker compose -f docker-compose.prod.yml ps
+```
+
+При успешном запуске должны работать контейнеры:
+
+* `web` — Gunicorn + Django
+* `nginx`
+* `db` — PostgreSQL
+* `redis`
+* `celery`
+* `beat`
+* `worker` (опционально)
+* `static_volume`, `media_volume`, `postgres_data`
+
+---
+
+## 5. 🗄️ Миграции + сбор статических файлов
+
+После первого деплоя:
+
+```bash
+docker compose -f docker-compose.prod.yml exec web python manage.py migrate
+docker compose -f docker-compose.prod.yml exec web python manage.py collectstatic --noinput
+```
+
+---
+
+## 6. 🧪 Проверка Healthcheck API
+
+Открыть в браузере:
+
+```
+http://localhost/api/health/
+```
+
+Или через curl:
+
+```bash
+curl http://localhost/api/health/
+```
+
+---
+
+## 7. 📡 Production-URL
+
+Если деплой локально:
+
+```
+http://localhost
+```
+
+Если на сервере:
+
+```
+http://<SERVER_IP>
+```
+
+---
+
+## 8. 🔄 Перезапуск и остановка
+
+Перезапуск:
+
+```bash
+docker compose -f docker-compose.prod.yml restart
+```
+
+Остановка:
+
+```bash
+docker compose -f docker-compose.prod.yml down
+```
+
+Полная остановка + очистка volume:
+
+```bash
+docker compose -f docker-compose.prod.yml down -v
+```
+
+---
+
+## 9. 🛡️ Защита: как подготовиться
+
+После деплоя стоит проверить:
+
+* доступность API `/api/health/`
+* работу Celery и Celery beat
+* правильность статики `/static/`
+* корректность пересоздания контейнеров
+* отсутствующие ошибки в логах:
+
+```bash
+docker compose -f docker-compose.prod.yml logs -f web
+```
+
+---
+

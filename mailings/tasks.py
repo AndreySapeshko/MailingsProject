@@ -3,6 +3,7 @@ from django.utils import timezone
 from celery_app.celery import app
 from pathlib import Path
 
+
 import logging
 
 
@@ -33,6 +34,13 @@ def process_mailings():
             logger.info(f"✅ Рассылка {mailing.id} успешно обработана.")
         except Exception as e:
             logger.exception(f"❌ Ошибка при обработке рассылки {mailing.id}: {e}")
+
+@shared_task(name="mailings.tasks.retry_failed")
+def retry_failed():
+    """Повторная отправка всех failed писем по активным рассылкам."""
+    from mailings.models import Mailing
+    for mailing in Mailing.objects.filter(status="launched"):
+        mailing.resend_failed()
 
 @shared_task
 def ping_celery():

@@ -82,10 +82,21 @@ class Mailing(models.Model):
         return self.recipients.filter(is_active=True)
 
     def send_now(self):
-        """Отправка рассылки вручную"""
+        """Отправка рассылки вручную — ИДЕМПОТЕНТНО."""
 
         sent_count = 0
+
+        # Уже успешно обработанные email, чтобы не отправлять повторно
+        already_sent = set(
+            self.logs.filter(status="success").values_list("recipient__email", flat=True)
+        )
+
         for recipient in self.get_recipients():
+
+            # Пропускаем, если письмо уже успешно отправлено ранее
+            if recipient.email in already_sent:
+                continue
+
             try:
                 send_mail(
                     subject=self.message.subject,
@@ -94,6 +105,7 @@ class Mailing(models.Model):
                     recipient_list=[recipient.email],
                     fail_silently=False,
                 )
+
                 MailingLog.objects.create(
                     mailing=self,
                     recipient=recipient,
@@ -102,6 +114,7 @@ class Mailing(models.Model):
                     user=self.user,
                 )
                 sent_count += 1
+
             except Exception as e:
                 MailingLog.objects.create(
                     mailing=self,
@@ -110,8 +123,51 @@ class Mailing(models.Model):
                     server_response=str(e),
                     user=self.user,
                 )
-        self.status = 'completed'
-        self.save(update_fields=['status'])
+
+        # Статус completed только если всё отправлено впервые
+        if self.logs.filter(status="failed").count() == 0:
+            self.status = 'completed'
+            self.save(update_fields=['status'])
+
+        return sent_count
+
+    def resend_failed(self):
+        """Повторная отправка только тем, где статус failed."""
+        failed_logs = self.logs.filter(status="failed")
+
+        sent_count = 0
+
+        for log in failed_logs:
+            recipient = log.recipient
+            try:
+                send_mail(
+                    subject=self.message.subject,
+                    message=self.message.body,
+                    from_email=settings.DEFAULT_FROM_EMAIL,
+                    recipient_list=[recipient.email],
+                    fail_silently=False,
+                )
+
+                # Создаём новый success лог
+                MailingLog.objects.create(
+                    mailing=self,
+                    recipient=recipient,
+                    status='success',
+                    server_response='OK',
+                    user=self.user,
+                )
+                sent_count += 1
+
+            except Exception as e:
+                # Перезаписываем status в старом логе? — нет
+                # Создаём НОВЫЙ лог, чтобы видеть историю
+                MailingLog.objects.create(
+                    mailing=self,
+                    recipient=recipient,
+                    status='failed',
+                    server_response=str(e),
+                    user=self.user,
+                )
         return sent_count
 
     def launch(self):
